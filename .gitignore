@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# local sqlite database (contains seeded accounts/orders — never commit)
+*.db
+*.db-journal
+
 # debug
 npm-debug.log*
 yarn-debug.log*
