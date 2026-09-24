@@ -17,23 +17,25 @@ The store is deploy-ready. What's left is account setup on your side — no code
    DATABASE_URL="libsql://flux-store-youruser.turso.io?authToken=YOUR_TOKEN"
    ```
 
-### إنشاء الجداول وبيانات البداية — Push schema + seed (من جهازك)
+### إنشاء الجداول وبيانات البداية — Push schema + seed
 
-شغّل هذه الأوامر من مجلد المشروع (ستتصل بقاعدة Turso مباشرة):
+> ملاحظة: `prisma db push` لا يعمل مع روابط `libsql://` مباشرة، لذلك نولّد SQL التصميم
+> ونطبّقه عبر سكربت `scripts/apply-schema.mjs` (بدون الحاجة لـ Turso CLI).
+
 ```powershell
-$env:DATABASE_URL="libsql://flux-store-youruser.turso.io?authToken=YOUR_TOKEN"
+# 1) توليد SQL التصميم من ملف schema (فقط)
+npx prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > schema.sql
 
-# 1) إنشاء الجداول
-npx prisma db push
+# 2) تطبيقه على قاعدة Turso
+$env:TURSO_URL="libsql://flux-store-xxx.turso.io?authToken=YOUR_TOKEN"
+node scripts/apply-schema.mjs schema.sql
 
-# 2) بيانات البداية (13 منتج + حساب المدير)
-npm run seed
+# 3) بيانات البداية (13 منتج + حساب المدير)
+$env:DATABASE_URL="libsql://flux-store-xxx.turso.io?authToken=YOUR_TOKEN"
+npx tsx prisma/seed.ts
 ```
-> لو أخطأ `db push` مع روابط `libsql://`، استخدم المسار البديل:
-> ```powershell
-> npx prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > schema.sql
-> # ثم طبّق الملف من لوحة Turso: Database → Run query / turso db shell
-> ```
+
+> سكربت `apply-schema.mjs` آمن لإعادة التشغيل — يطبق كل `CREATE` مرة واحدة ويبلغ النتيجة.
 
 ---
 
