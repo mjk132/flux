@@ -1,0 +1,254 @@
+@import "tailwindcss";
+
+@theme {
+  /* ─── FLUX Palette: layered darks, blue as accent ─── */
+  --color-void: #04020a;
+  --color-near-black: #06030c;
+  --color-dark-purple: #0a0614;
+  --color-deep-purple: #100a1c;
+  --color-surface: #0e0817;
+  --color-surface-raised: #160e26;
+  --color-grape: #1d1333;
+  --color-border: #1c1330;
+  --color-border-subtle: #141025;
+  --color-white: #f6f3ff;
+  --color-gray-text: #a293c4;
+  --color-gray-muted: #6f6394;
+  --color-faint: #463d63;
+  --color-purple-accent: #2f7bff;
+  --color-violet: #5aa2ff;
+  --color-amethyst: #9cc2ff;
+  --color-danger: #f43f5e;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-info: #60a5fa;
+
+  --font-sans: "Cairo", "Tajawal", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Cairo", "Tajawal", "Segoe UI", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #04020a;
+  color: #f6f3ff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: #1a63e6;
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #04020a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1c1330;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2f7bff;
+}
+
+/* ─── Utilities ─── */
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Gradient text for premium headings */
+.text-gradient {
+  background: linear-gradient(120deg, #ffffff 0%, #cfe2ff 55%, #5aa2ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Fine grid backdrop for hero / big panels */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(47, 123, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 123, 255, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 40%, transparent 100%);
+}
+
+/* Subtle noise overlay */
+.noise-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Premium ring focus */
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-accent/60;
+}
+
+/* Hide scrollbar (for horizontal scrollers) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Gentle floating for hero visual */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+.animate-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+.animate-float-delayed {
+  animation: float-y 7.5s ease-in-out 1.2s infinite;
+}
+.animate-float-slow {
+  animation: float-y 9s ease-in-out 0.6s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-delayed,
+  .animate-float-slow {
+    animation: none;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   FLUX LIGHT MODE  (scoped: full storefront via `.flux-light` on the
+   store layout root)
+   The palette is emitted as real CSS variables (@theme), so this scope
+   re-maps the whole dark design system to a light one for every
+   customer-facing page, the navbar and the footer. Admin keeps the
+   dark tokens (separate layout, outside the scope).
+   ════════════════════════════════════════════════════════════════════ */
+
+.flux-light {
+  --color-void: #f4f7fc;
+  --color-near-black: #eef2f9;
+  --color-dark-purple: #e9eef8;
+  --color-deep-purple: #e7edf9;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-grape: #e0e9fa;
+  --color-border: #d9e1f0;
+  --color-border-subtle: #ecf0f8;
+  --color-white: #101828;
+  --color-gray-text: #46566f;
+  --color-gray-muted: #5c6b85;
+  --color-faint: #7e8ba3;
+  /* Light-theme semantic values tuned for WCAG AA on light backgrounds
+     (text on white/tinted chips ≥ 4.5:1, white glyphs on solid ≥ 4.5:1). */
+  --color-purple-accent: #1a63e6;
+  --color-violet: #2563eb;
+  --color-danger: #c81f3c;
+  --color-success: #0d7a56;
+  --color-warning: #996105;
+  --color-info: #1f5fdb;
+}
+
+/* Intentionally-dark panels (category tiles, product art covers) keep
+   the dark palette inside the light homepage. */
+.flux-light .flux-dark-panel {
+  --color-void: #04020a;
+  --color-near-black: #06030c;
+  --color-dark-purple: #0a0614;
+  --color-deep-purple: #100a1c;
+  --color-surface: #0e0817;
+  --color-surface-raised: #160e26;
+  --color-grape: #1d1333;
+  --color-border: #1c1330;
+  --color-border-subtle: #141025;
+  --color-white: #f6f3ff;
+  --color-gray-text: #a293c4;
+  --color-gray-muted: #6f6394;
+  --color-faint: #463d63;
+  /* Keep the original dark-theme accents inside dark panels. */
+  --color-purple-accent: #2f7bff;
+  --color-violet: #5aa2ff;
+  --color-danger: #f43f5e;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-info: #60a5fa;
+}
+
+/* Mirror the light theme onto <body> itself (LightScope adds the class
+   at runtime) so the page background, default text and scrollbars match
+   the light storefront instead of the hardcoded dark body styles. */
+body.flux-light {
+  background-color: #f4f7fc;
+  color: #101828;
+}
+
+body.flux-light::-webkit-scrollbar-track {
+  background: #f4f7fc;
+}
+
+body.flux-light::-webkit-scrollbar-thumb {
+  background: #c6d4ee;
+}
+
+body.flux-light::-webkit-scrollbar-thumb:hover {
+  background: #1a63e6;
+}
+
+/* Gradient headline — readable blue gradient on light backgrounds */
+.flux-light .text-gradient {
+  background: linear-gradient(120deg, #1a63e6 0%, #2f7bff 55%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Fine grid — a touch stronger on light so it still reads */
+.flux-light .bg-grid {
+  background-image:
+    linear-gradient(rgba(47, 123, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 123, 255, 0.14) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 40%, transparent 100%);
+}
+
+/* Solid tinted chips / badges / buttons keep white glyphs */
+.flux-light [class~="bg-purple-accent"],
+.flux-light [class~="bg-danger"],
+.flux-light [class~="bg-success"],
+.flux-light [class~="bg-warning"],
+.flux-light [class~="bg-info"] {
+  color: #ffffff;
+}
+
+/* Keep them solid blue on hover (neutralizes hover:bg-violet washout) */
+.flux-light [class~="bg-purple-accent"]:hover {
+  background-color: #1a63e6;
+}
+
+/* Saturated gradient boxes that carry white glyphs (step icons, avatars) */
+.flux-light [class*="from-purple-accent"][class*="to-violet"],
+.flux-light [class*="from-amber-500"][class*="to-orange-500"] {
+  color: #ffffff;
+}
