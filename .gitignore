@@ -47,4 +47,6 @@ public/uploads/
 *.tsbuildinfo
 next-env.d.ts
 
-/src/generated/prisma
+# The generated Prisma client is committed to the repo so that Vercel
+# production builds never depend on regenerate timing or env vars.
+# Keep it in sync by running `prisma generate` after schema changes.

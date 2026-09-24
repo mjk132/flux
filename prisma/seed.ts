@@ -571,10 +571,10 @@ async function main() {
   // ==================== SETTINGS ====================
   console.log("Creating settings...");
   await prisma.setting.create({ data: { key: "store_name", value: "FLUX STORE", type: "text" } });
-  await prisma.setting.create({ data: { key: "store_tagline", value: "حلول رقمية بهوية مختلفة", type: "text" } });
-  await prisma.setting.create({ data: { key: "hero_title", value: "حلول رقمية بهوية مختلفة", type: "text" } });
+  await prisma.setting.create({ data: { key: "store_tagline", value: "منتجات رقمية بهوية مختلفة", type: "text" } });
+  await prisma.setting.create({ data: { key: "hero_title", value: "منتجات رقمية بهوية مختلفة", type: "text" } });
   await prisma.setting.create({ data: { key: "hero_description", value: "بوتات ديسكورد، سكربتات FiveM، مواقع وتصاميم — تسليم سريع وجودة عالية ودعم متواصل", type: "text" } });
-  await prisma.setting.create({ data: { key: "discord_link", value: "https://discord.gg/fluxstore", type: "url" } });
+  await prisma.setting.create({ data: { key: "discord_link", value: "https://discord.gg/https://discord.gg/xRQGGKfZzN", type: "url" } });
   await prisma.setting.create({ data: { key: "discord_guild_id", value: "", type: "text" } });
   await prisma.setting.create({ data: { key: "paypal_email", value: "", type: "text" } });
   await prisma.setting.create({ data: { key: "paypal_qr_image", value: "", type: "url" } });

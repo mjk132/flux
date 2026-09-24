@@ -1,6 +1,6 @@
 export const STORE = {
   name: "FLUX STORE",
-  tagline: "حلول رقمية بهوية مختلفة",
+  tagline: "منتجات رقمية بهوية مختلفة",
   description: "Premium digital store for scripts, bots, websites, and design.",
   url: process.env.NEXT_PUBLIC_STORE_URL || "http://localhost:3000",
   currency: "USD",
