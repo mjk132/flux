@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 export async function PUT(
   request: NextRequest,
@@ -32,6 +33,8 @@ export async function PUT(
       data: updateData,
     });
 
+    revalidateStorefront();
+
     return NextResponse.json({ faq: updatedFaq });
   } catch (error) {
     console.error("Error updating FAQ:", error);
@@ -56,6 +59,9 @@ export async function DELETE(
     }
 
     await prisma.fAQ.delete({ where: { id } });
+
+    revalidateStorefront();
+
     return NextResponse.json({ message: "FAQ deleted successfully" });
   } catch (error) {
     console.error("Error deleting FAQ:", error);

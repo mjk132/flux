@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 export async function GET(
   _request: NextRequest,
@@ -105,6 +106,8 @@ export async function PUT(
       data: updateData,
     });
 
+    revalidateStorefront();
+
     return Response.json(category);
   } catch (error) {
     console.error("PUT /api/categories/[id] error:", error);
@@ -149,6 +152,8 @@ export async function DELETE(
     }
 
     await prisma.category.delete({ where: { id } });
+
+    revalidateStorefront();
 
     return Response.json({ message: "Category deleted successfully" });
   } catch (error) {

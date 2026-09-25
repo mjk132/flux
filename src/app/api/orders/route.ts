@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 import { generateOrderNumber } from "@/lib/utils";
 import {
   storeImage,
@@ -285,6 +286,10 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Stock dropped inside the transaction above, so the product pages must
+    // stop showing the sold-out quantity on the next visit.
+    revalidateStorefront();
 
     return json({ success: true, data: fullOrder }, 201);
   } catch (error) {

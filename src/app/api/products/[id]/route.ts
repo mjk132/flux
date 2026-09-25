@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 export async function GET(
   _request: NextRequest,
@@ -176,6 +177,8 @@ export async function PUT(
       },
     });
 
+    revalidateStorefront();
+
     return Response.json(product);
   } catch (error) {
     console.error("PUT /api/products/[id] error:", error);
@@ -207,6 +210,8 @@ export async function DELETE(
       where: { id },
       data: { status: "ARCHIVED" },
     });
+
+    revalidateStorefront();
 
     return Response.json({ message: "Product archived successfully" });
   } catch (error) {

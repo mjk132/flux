@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 function json(data: Record<string, unknown>, status = 200) {
   return NextResponse.json(data, { status });
@@ -43,6 +44,8 @@ export async function PUT(
       },
     });
 
+    revalidateStorefront();
+
     return json({ success: true, data: updated });
   } catch (error) {
     console.error("Review PUT error:", error);
@@ -71,6 +74,8 @@ export async function DELETE(
     }
 
     await prisma.review.delete({ where: { id } });
+
+    revalidateStorefront();
 
     return json({ success: true, message: "Review deleted successfully" });
   } catch (error) {

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 export async function GET(_request: NextRequest) {
   try {
@@ -63,6 +64,8 @@ export async function POST(request: NextRequest) {
         sortOrder: sortOrder || 0,
       },
     });
+
+    revalidateStorefront();
 
     return Response.json(category, { status: 201 });
   } catch (error) {

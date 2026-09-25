@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 export async function GET() {
   try {
@@ -40,6 +41,8 @@ export async function POST(request: NextRequest) {
         sortOrder: sortOrder ?? 0,
       },
     });
+
+    revalidateStorefront();
 
     return NextResponse.json({ faq }, { status: 201 });
   } catch (error) {

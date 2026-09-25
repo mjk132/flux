@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 const PUBLIC_KEYS = [
   "store_name",
@@ -77,6 +78,10 @@ export async function PUT(request: NextRequest) {
       },
       orderBy: { key: "asc" },
     });
+
+    // The homepage reads settings (e.g. the Discord invite link) at render
+    // time, so it has to be regenerated after a settings save.
+    revalidateStorefront();
 
     return NextResponse.json({ settings: updatedSettings });
   } catch (error) {

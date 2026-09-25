@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 export async function GET(request: NextRequest) {
   try {
@@ -227,6 +228,8 @@ export async function POST(request: NextRequest) {
         category: { select: { id: true, name: true, slug: true } },
       },
     });
+
+    revalidateStorefront();
 
     return Response.json(product, { status: 201 });
   } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
+import { revalidateStorefront } from "@/lib/storefront-cache";
 
 function json(data: Record<string, unknown>, status = 200) {
   return NextResponse.json(data, { status });
@@ -125,6 +126,10 @@ export async function POST(req: NextRequest) {
         user: { select: { id: true, name: true, avatar: true } },
       },
     });
+
+    // Only APPROVED reviews are rendered on the storefront, so only an
+    // approved submission is worth invalidating the cached pages for.
+    if (review.status === "APPROVED") revalidateStorefront();
 
     return json({ success: true, data: review }, 201);
   } catch (error) {
