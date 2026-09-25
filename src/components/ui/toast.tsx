@@ -1,17 +1,24 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useSyncExternalStore } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from "lucide-react";
 
 type ToastType = "success" | "error" | "warning" | "info";
 
-interface Toast {
+export interface ToastAction {
+  label: string;
+  href: string;
+}
+
+export interface Toast {
   id: string;
   type: ToastType;
   title: string;
   message?: string;
   duration?: number;
+  action?: ToastAction;
 }
 
 const icons = {
@@ -28,46 +35,113 @@ const colors = {
   info: "border-info/30 bg-info/10 text-info",
 };
 
-export function ToastContainer() {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+/* ── One shared queue ──────────────────────────────────────────────────
+   This used to exist in two disconnected copies: <ToastContainer> kept its
+   own `toasts` array and useToast() kept another one, so a store component
+   calling success() wrote into a list nothing ever rendered — the customer
+   clicked "add to cart" and the page stayed completely silent. The single
+   module-level queue below is what both the renderer and the hook talk to,
+   so any component, on any page, can raise a toast that actually appears.
 
-  const addToast = useCallback(
-    (toast: Omit<Toast, "id">) => {
-      const id = Math.random().toString(36).slice(2);
-      setToasts((prev) => [...prev, { ...toast, id }]);
-      setTimeout(() => removeToast(id), toast.duration || 4000);
-    },
-    []
+   It is a plain module store (not React context) on purpose: the container
+   lives in the root layout, one level above every caller. */
+
+/** Never let toasts pile up — keep only the newest few on screen. */
+const MAX_VISIBLE = 3;
+
+let queue: Toast[] = [];
+let listeners = new Set<() => void>();
+const timers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function emit() {
+  for (const listener of listeners) listener();
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function getSnapshot() {
+  return queue;
+}
+
+/* The server renders no toasts. Returning one constant keeps the snapshot
+   referentially stable, which useSyncExternalStore requires. */
+const NO_TOASTS: Toast[] = [];
+function getServerSnapshot() {
+  return NO_TOASTS;
+}
+
+function dismiss(id: string) {
+  const timer = timers.get(id);
+  if (timer) {
+    clearTimeout(timer);
+    timers.delete(id);
+  }
+  queue = queue.filter((t) => t.id !== id);
+  emit();
+}
+
+function pushToast(toast: Omit<Toast, "id">): string {
+  const id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+  // Drop the oldest when at capacity so a burst of clicks stays readable.
+  queue = [...queue, { ...toast, id }].slice(-MAX_VISIBLE);
+  emit();
+
+  timers.set(
+    id,
+    setTimeout(() => dismiss(id), toast.duration ?? 4000)
   );
+  return id;
+}
 
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+export function ToastContainer() {
+  const toasts = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-[100] flex flex-col gap-2" dir="ltr">
+    /* pointer-events-none on the wrapper so an empty/stacked area never
+       blocks clicks on the page underneath; each toast opts back in. */
+    <div
+      dir="rtl"
+      aria-live="polite"
+      className="pointer-events-none fixed inset-x-4 bottom-20 z-[100] flex flex-col items-start gap-2 lg:inset-x-auto lg:bottom-6 lg:right-6"
+    >
       {toasts.map((toast) => {
         const Icon = icons[toast.type];
         return (
           <div
             key={toast.id}
             className={cn(
-              "flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg min-w-[280px] max-w-md animate-slide-in",
+              /* bottom-20 on small screens clears the mobile bottom nav */
+              "pointer-events-auto flex w-full max-w-md min-w-[260px] animate-flux-toast items-start gap-3 rounded-xl border px-4 py-3 shadow-xl backdrop-blur-md",
               colors[toast.type]
             )}
           >
-            <Icon className="h-5 w-5 flex-shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
+            <Icon className="mt-0.5 h-5 w-5 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
               <p className="font-medium">{toast.title}</p>
               {toast.message && (
-                <p className="text-sm opacity-80 mt-0.5">{toast.message}</p>
+                <p className="mt-0.5 text-sm opacity-80">{toast.message}</p>
+              )}
+              {toast.action && (
+                <Link
+                  href={toast.action.href}
+                  onClick={() => dismiss(toast.id)}
+                  className="mt-2 inline-flex items-center rounded-lg border border-current px-2.5 py-1 text-xs font-bold transition-opacity hover:opacity-75"
+                >
+                  {toast.action.label}
+                </Link>
               )}
             </div>
             <button
-              onClick={() => removeToast(toast.id)}
-              className="flex-shrink-0 p-1 opacity-50 hover:opacity-100 transition-opacity"
+              onClick={() => dismiss(toast.id)}
+              className="flex-shrink-0 p-1 opacity-50 transition-opacity hover:opacity-100"
               aria-label="إغلاق"
             >
               <X className="h-4 w-4" />
@@ -79,30 +153,26 @@ export function ToastContainer() {
   );
 }
 
+/* The helpers are stable module functions, so calling this hook does not
+   make a component re-render every time a toast appears — relevant for the
+   product grid, where every card would otherwise re-render at once. */
 export function useToast() {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-
-  const addToast = useCallback(
-    (toast: Omit<Toast, "id">) => {
-      const id = Math.random().toString(36).slice(2);
-      setToasts((prev) => [...prev, { ...toast, id }]);
-      setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), toast.duration || 4000);
-    },
-    []
-  );
-
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+  const addToast = useCallback((toast: Omit<Toast, "id">) => {
+    pushToast(toast);
   }, []);
 
-  const success = (title: string, message?: string) =>
-    addToast({ type: "success", title, message });
-  const error = (title: string, message?: string) =>
-    addToast({ type: "error", title, message });
-  const warning = (title: string, message?: string) =>
-    addToast({ type: "warning", title, message });
-  const info = (title: string, message?: string) =>
-    addToast({ type: "info", title, message });
+  const removeToast = useCallback((id: string) => {
+    dismiss(id);
+  }, []);
 
-  return { toasts, addToast, removeToast, success, error, warning, info };
+  const success = (title: string, message?: string, action?: ToastAction) =>
+    pushToast({ type: "success", title, message, action });
+  const error = (title: string, message?: string, action?: ToastAction) =>
+    pushToast({ type: "error", title, message, action });
+  const warning = (title: string, message?: string, action?: ToastAction) =>
+    pushToast({ type: "warning", title, message, action });
+  const info = (title: string, message?: string, action?: ToastAction) =>
+    pushToast({ type: "info", title, message, action });
+
+  return { addToast, removeToast, success, error, warning, info };
 }

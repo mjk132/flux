@@ -61,13 +61,18 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
     e.preventDefault();
     e.stopPropagation();
     if (p.stock <= 0) return;
+    const { final } = getSalePrice(p);
+    const name = p.nameAr || p.name;
     addItem({
       productId: p.id,
-      name: p.name,
-      price: getSalePrice(p).final,
+      name,
+      price: final,
       image: p.images?.[0]?.url || "/logo.png",
     });
-    showSuccess("تمت إضافة المنتج إلى السلة");
+    showSuccess("أُضيفت إلى السلة", `${name} — ${formatPrice(final)}`, {
+      label: "عرض السلة",
+      href: "/cart",
+    });
   };
 
   return (

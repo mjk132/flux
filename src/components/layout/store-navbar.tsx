@@ -50,7 +50,11 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
   const pathname = usePathname();
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const getItemCount = useCartStore((s) => s.getItemCount);
+  /* Subscribe to the items themselves, not to getItemCount (a stable
+     function reference that never changes, which meant the badge only
+     refreshed after a route change — you could add three products and the
+     count would sit there, stale, until you navigated). */
+  const cartItems = useCartStore((s) => s.items);
   const wishlistItems = useWishlistStore((s) => s.items);
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -64,8 +68,34 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
     setMounted(true);
   }, []);
 
-  const cartCount = mounted ? getItemCount() : 0;
+  const cartCount = mounted
+    ? cartItems.reduce((sum, item) => sum + item.quantity, 0)
+    : 0;
   const wishlistCount = mounted ? wishlistItems.length : 0;
+
+  /* Pop the cart icon whenever an item lands in it. The ref starts null so
+     the very first count read after hydration (a returning customer's
+     saved cart) doesn't animate — only genuine additions do. */
+  const [cartBump, setCartBump] = useState(false);
+  const previousCartCount = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (previousCartCount.current === null) {
+      previousCartCount.current = cartCount;
+      return;
+    }
+
+    if (cartCount > previousCartCount.current) {
+      setCartBump(true);
+      const timer = setTimeout(() => setCartBump(false), 650);
+      previousCartCount.current = cartCount;
+      return () => clearTimeout(timer);
+    }
+
+    previousCartCount.current = cartCount;
+  }, [cartCount, mounted]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -235,14 +265,23 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
             <Link
               href="/cart"
               className="relative rounded-lg p-2 text-gray-text transition-colors hover:text-white"
-              aria-label="السلة"
+              aria-label={cartCount > 0 ? `السلة، ${cartCount} منتج` : "السلة"}
             >
-              <ShoppingCart className="h-[18px] w-[18px]" />
-              {cartCount > 0 && (
-                <span className="absolute -left-0.5 -top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-purple-accent px-1 text-[9px] font-bold text-white ring-2 ring-near-black">
-                  {cartCount}
-                </span>
-              )}
+              {/* Keyed on the count so every addition restarts the pop, even
+                  when two clicks land inside one animation window. The inner
+                  span sits exactly where the icon used to, so the badge keeps
+                  its position while both scale together. */}
+              <span
+                key={cartBump ? `bump-${cartCount}` : "idle"}
+                className={cn("relative block", cartBump && "flux-cart-bump")}
+              >
+                <ShoppingCart className="h-[18px] w-[18px]" />
+                {cartCount > 0 && (
+                  <span className="absolute -left-2.5 -top-2.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-purple-accent px-1 text-[9px] font-bold text-white ring-2 ring-near-black">
+                    {cartCount}
+                  </span>
+                )}
+              </span>
             </Link>
 
             <div className="mx-1 hidden h-5 w-px bg-border sm:block" />

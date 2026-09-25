@@ -7,6 +7,7 @@ import { useWishlistStore } from "@/store/wishlist";
 import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 import { getSalePrice } from "@/lib/pricing";
+import { useToast } from "@/components/ui/toast";
 
 interface Product {
   id: string;
@@ -23,6 +24,7 @@ interface Product {
 export default function WishlistPage() {
   const { items, toggle } = useWishlistStore();
   const addItem = useCartStore((s) => s.addItem);
+  const { success } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,11 +59,17 @@ export default function WishlistPage() {
   }, [items]);
 
   const handleAddToCart = (product: Product) => {
+    const name = product.nameAr || product.name;
+    const price = getSalePrice(product).final;
     addItem({
       productId: product.id,
-      name: product.nameAr || product.name,
-      price: getSalePrice(product).final,
+      name,
+      price,
       image: product.images[0]?.url || "",
+    });
+    success("أُضيفت إلى السلة", `${name} — ${formatPrice(price)}`, {
+      label: "عرض السلة",
+      href: "/cart",
     });
   };
 

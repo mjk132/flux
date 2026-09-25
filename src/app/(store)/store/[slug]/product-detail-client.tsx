@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 import { getSalePrice } from "@/lib/pricing";
+import { useToast } from "@/components/ui/toast";
 
 interface ProductInfo {
   id: string;
@@ -24,18 +25,24 @@ export default function ProductDetailClient({ product }: { product: ProductInfo 
   const [added, setAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
   const router = useRouter();
+  const { success } = useToast();
 
   const finalPrice = getSalePrice(product).final;
 
   const handleAddToCart = () => {
+    const name = product.nameAr || product.name;
     addItem({
       productId: product.id,
-      name: product.nameAr || product.name,
+      name,
       price: finalPrice,
       image: product.image,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+    success("أُضيفت إلى السلة", `${name} — ${formatPrice(finalPrice)}`, {
+      label: "عرض السلة",
+      href: "/cart",
+    });
   };
 
   const handleBuyNow = () => {

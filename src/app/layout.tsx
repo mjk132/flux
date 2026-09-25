@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-// Toast notifications handled per-layout
+import { ToastContainer } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "Flux Store - متجرك الرقمي الأول",
@@ -51,6 +51,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <div className="flex min-h-screen flex-col">{children}</div>
+        {/* Mounted once, above every route: the store's add-to-cart
+            feedback and the admin panel's save confirmations both render
+            here (see components/ui/toast.tsx). */}
+        <ToastContainer />
       </body>
     </html>
   );

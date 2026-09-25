@@ -74,13 +74,18 @@ export function ProductCard({ product, className }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     if (outOfStock) return;
+    const name = product.nameAr || product.name;
     addItem({
       productId: product.id,
-      name: product.name,
+      name,
       price: salePrice,
       image: primaryImage?.url || "/logo.png",
     });
-    success("تمت الإضافة إلى السلة");
+    success(
+      "أُضيفت إلى السلة",
+      `${name} — ${formatPrice(salePrice)}`,
+      { label: "عرض السلة", href: "/cart" }
+    );
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
