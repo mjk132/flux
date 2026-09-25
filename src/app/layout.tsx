@@ -26,8 +26,10 @@ export const viewport: Viewport = {
 
 /* Runs before first paint so the correct theme is on <html> immediately —
    no flash of the wrong palette while React hydrates. Keep in sync with
-   src/store/theme.ts (same storage key, same scope on <html>). */
-const themeInitScript = `(function(){try{var t=null;var s=localStorage.getItem("theme-storage");if(s){var p=JSON.parse(s).state;if(p&&(p.theme==="light"||p.theme==="dark")){t=p.theme;}}if(!t){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}var r=document.documentElement;r.setAttribute("data-theme",t);r.style.colorScheme=t;r.classList.toggle("flux-light",t==="light");r.classList.toggle("flux-dark",t==="dark");var m=document.querySelector('meta[name="theme-color"]');if(m){m.setAttribute("content",t==="light"?"#f4f7fc":"#04020a");}}catch(e){}})();`;
+   src/store/theme.ts (same storage key, same scope on <html>).
+   The storage read has its own try/catch so a corrupted localStorage
+   entry can never skip the system-preference fallback. */
+const themeInitScript = `(function(){try{var t=null;try{var s=localStorage.getItem("theme-storage");if(s){var p=JSON.parse(s).state;if(p&&(p.theme==="light"||p.theme==="dark")){t=p.theme;}}}catch(e){}if(!t){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}var r=document.documentElement;r.setAttribute("data-theme",t);r.style.colorScheme=t;r.classList.toggle("flux-light",t==="light");r.classList.toggle("flux-dark",t==="dark");var m=document.querySelector('meta[name="theme-color"]');if(m){m.setAttribute("content",t==="light"?"#f4f7fc":"#04020a");}}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -35,7 +37,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className="h-full antialiased">
+    // suppressHydrationWarning: the pre-paint script below legitimately
+    // mutates <html> attributes before React takes over.
+    <html lang="ar" dir="rtl" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
