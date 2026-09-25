@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { revalidateStorefront } from "@/lib/storefront-cache";
+import { getSalePrice } from "@/lib/pricing";
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,10 +30,28 @@ export async function GET(request: NextRequest) {
       where.category = { slug: category };
     }
 
-    if (minPrice || maxPrice) {
-      where.price = {};
-      if (minPrice) (where.price as Record<string, number>).gte = parseFloat(minPrice);
-      if (maxPrice) (where.price as Record<string, number>).lte = parseFloat(maxPrice);
+    const priceMin = minPrice ? parseFloat(minPrice) : null;
+    const priceMax = maxPrice ? parseFloat(maxPrice) : null;
+
+    /* `price` is the catalogue price, but the card displays — and checkout
+       charges — that price minus the product's own discount (lib/pricing).
+       Filtering or sorting on the catalogue column would therefore disagree
+       with what is on screen: a $20 product at 50% off reads as $10 in the
+       grid yet would be skipped by a "max $15" filter, and would sort after
+       a plain $15 product. So any price criteria are applied to the
+       effective price below.
+
+       The catalogue minimum stays in the SQL query as a safe pre-filter:
+       the effective price can never exceed the catalogue price, so no
+       matching row can be lost by it. */
+    const needsEffectivePrice =
+      priceMin !== null ||
+      priceMax !== null ||
+      sort === "price-asc" ||
+      sort === "price-desc";
+
+    if (priceMin !== null) {
+      where.price = { gte: priceMin };
     }
 
     if (productType) {
@@ -71,12 +90,12 @@ export async function GET(request: NextRequest) {
         break;
     }
 
-    const [products, total] = await Promise.all([
-      prisma.product.findMany({
+    let products;
+    let total: number;
+
+    if (needsEffectivePrice) {
+      const candidates = await prisma.product.findMany({
         where,
-        orderBy,
-        skip,
-        take: limit,
         include: {
           images: { orderBy: { sortOrder: "asc" }, take: 1 },
           category: { select: { id: true, name: true, slug: true } },
@@ -85,9 +104,43 @@ export async function GET(request: NextRequest) {
             select: { rating: true },
           },
         },
-      }),
-      prisma.product.count({ where }),
-    ]);
+      });
+
+      const ranked = candidates
+        .map((product) => ({ product, effective: getSalePrice(product).final }))
+        .filter(
+          ({ effective }) =>
+            (priceMin === null || effective >= priceMin) &&
+            (priceMax === null || effective <= priceMax)
+        );
+
+      ranked.sort((a, b) =>
+        sort === "price-asc"
+          ? a.effective - b.effective
+          : b.effective - a.effective
+      );
+
+      total = ranked.length;
+      products = ranked.slice(skip, skip + limit).map((r) => r.product);
+    } else {
+      [products, total] = await Promise.all([
+        prisma.product.findMany({
+          where,
+          orderBy,
+          skip,
+          take: limit,
+          include: {
+            images: { orderBy: { sortOrder: "asc" }, take: 1 },
+            category: { select: { id: true, name: true, slug: true } },
+            reviews: {
+              where: { status: "APPROVED" },
+              select: { rating: true },
+            },
+          },
+        }),
+        prisma.product.count({ where }),
+      ]);
+    }
 
     const productsWithRating = products.map((product) => {
       const ratings = product.reviews.map((r) => r.rating);
