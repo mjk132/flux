@@ -60,10 +60,20 @@ export async function authFetch(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  const headers = {
-    "Content-Type": "application/json",
-    ...getAuthHeaders(),
-    ...options.headers,
+  const authHeaders = getAuthHeaders();
+  const isFormData = options.body instanceof FormData;
+  
+  const headers: Record<string, string> = {
+    ...authHeaders,
+    ...(options.headers as Record<string, string>),
   };
+  
+  // Don't set Content-Type for FormData - let browser set it with boundary
+  if (isFormData) {
+    delete headers["Content-Type"];
+  } else if (!headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+  
   return fetch(url, { ...options, headers });
 }

@@ -11,7 +11,9 @@ export const ALLOWED_IMAGE_TYPES = [
 ];
 
 export function isBlobUploadEnabled(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim());
+  // On Vercel, OIDC token is auto-injected when store is linked to project
+  // So we can use Blob if either RW token is set OR we're on Vercel (VERCEL=1)
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim() || process.env.VERCEL);
 }
 
 /**
@@ -43,12 +45,17 @@ export async function storeImage(
   const buffer = Buffer.from(await file.arrayBuffer());
 
   if (isBlobUploadEnabled()) {
-    const blob = await put(`uploads/${safeFolder}/${filename}`, buffer, {
-      access: "public",
-      contentType: file.type,
-      addRandomSuffix: false,
-    });
-    return blob.url;
+    try {
+      const blob = await put(`uploads/${safeFolder}/${filename}`, buffer, {
+        access: "public",
+        contentType: file.type,
+        addRandomSuffix: false,
+      });
+      return blob.url;
+    } catch (blobError) {
+      console.error("Vercel Blob upload error:", blobError);
+      throw new Error(`Blob upload failed: ${blobError instanceof Error ? blobError.message : String(blobError)}`);
+    }
   }
 
   const dir = path.join(process.cwd(), "public", "uploads", safeFolder);

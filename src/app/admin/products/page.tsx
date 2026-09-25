@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Pagination } from "@/components/ui/pagination";
+import { useToast } from "@/components/ui/toast";
 import {
   Select,
   SelectTrigger,
@@ -41,6 +42,9 @@ import {
   Search,
   Star,
   Award,
+  Image as ImageIcon,
+  Upload,
+  X,
 } from "lucide-react";
 
 interface Product {
@@ -94,6 +98,7 @@ const emptyProduct = {
   isFeatured: false,
   isBestSeller: false,
   productType: "DIGITAL",
+  images: [] as Array<{ url: string; alt?: string }>,
 };
 
 export default function AdminProducts() {
@@ -108,6 +113,7 @@ export default function AdminProducts() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyProduct);
   const [saving, setSaving] = useState(false);
+  const { success, error } = useToast();
 
   const fetchProducts = useCallback(async (page = 1) => {
     setLoading(true);
@@ -171,8 +177,71 @@ export default function AdminProducts() {
       isFeatured: product.isFeatured,
       isBestSeller: product.isBestSeller,
       productType: product.productType,
+      images: product.images?.map((img) => ({ url: img.url, alt: "" })) || [],
     });
     setModalOpen(true);
+  }
+
+  async function uploadImage(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", "products");
+    const res = await authFetch("/api/admin/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const json = await res.json();
+    if (!json.success || !json.url) throw new Error("فشل رفع الصورة");
+    return json.url;
+  }
+
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    if (form.images.length + files.length > 5) {
+      alert("الحد الأقصى 5 صور للمنتج");
+      return;
+    }
+    files.forEach(async (file) => {
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`الملف ${file.name} أكبر من 5 ميغابايت`);
+        return;
+      }
+      try {
+        const url = await uploadImage(file);
+        setForm({ ...form, images: [...form.images, { url, alt: file.name }] });
+      } catch {
+        alert("فشل رفع الصورة: " + file.name);
+      }
+    });
+    e.target.value = "";
+  }
+
+  function handleImageDrop(e: React.DragEvent) {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length === 0) return;
+    if (form.images.length + files.length > 5) {
+      alert("الحد الأقصى 5 صور للمنتج");
+      return;
+    }
+    files.forEach(async (file) => {
+      if (!file.type.startsWith("image/")) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`الملف ${file.name} أكبر من 5 ميغابايت`);
+        return;
+      }
+      try {
+        const url = await uploadImage(file);
+        setForm({ ...form, images: [...form.images, { url, alt: file.name }] });
+      } catch {
+        alert("فشل رفع الصورة: " + file.name);
+      }
+    });
+  }
+
+  function removeImage(index: number) {
+    setForm({ ...form, images: form.images.filter((_, i) => i !== index) });
   }
 
   async function handleSave() {
@@ -404,6 +473,49 @@ export default function AdminProducts() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
+            {/* Image Upload Section */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-text">
+                صور المنتج
+              </label>
+              <div
+                className="flex flex-wrap gap-3 border-2 border-dashed border-border rounded-xl p-4 transition-colors hover:border-purple-accent/50"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleImageDrop}
+              >
+                <label className="flex flex-col items-center justify-center gap-2 cursor-pointer w-28 h-28 rounded-lg border-2 border-dashed border-purple-accent/50 bg-purple-accent/5 text-purple-accent transition-all hover:bg-purple-accent/10">
+                  <Upload className="h-6 w-6" />
+                  <span className="text-xs">إضافة صورة</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleImageSelect}
+                  />
+                </label>
+                {form.images.map((img, index) => (
+                  <div key={index} className="relative w-28 h-28 rounded-lg overflow-hidden">
+                    <img
+                      src={img.url}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-danger/90 text-white flex items-center justify-center hover:bg-danger transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11.5px] text-gray-muted">
+                اسحب وأفلت الصور أو اضغط على "إضافة صورة". الحد الأقصى: 5 صور، 5 ميغابايت لكل صورة.
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="السعر"

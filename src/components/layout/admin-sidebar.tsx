@@ -140,7 +140,7 @@ export function AdminSidebar() {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-50 rounded-lg bg-surface p-2 text-gray-text shadow-lg hover:text-white lg:hidden"
+        className="fixed left-4 top-4 z-50 rounded-lg bg-[var(--color-surface)] p-2 text-gray-text shadow-lg hover:text-white lg:hidden"
         aria-label="فتح القائمة"
       >
         <Menu className="h-5 w-5" />
@@ -150,7 +150,7 @@ export function AdminSidebar() {
       <aside
         dir="rtl"
         className={cn(
-          "hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:border-l lg:border-border lg:bg-near-black transition-all duration-200",
+          "hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:border-l lg:border-border bg-[var(--color-near-black)] transition-all duration-200",
           collapsed ? "lg:w-[68px]" : "lg:w-64"
         )}
       >
@@ -166,7 +166,7 @@ export function AdminSidebar() {
           />
           <aside
             dir="rtl"
-            className="absolute inset-y-0 right-0 flex w-64 flex-col border-l border-border bg-near-black shadow-xl"
+            className="absolute inset-y-0 right-0 flex w-64 flex-col border-l border-border bg-[var(--color-near-black)] shadow-xl"
           >
             {sidebarContent}
           </aside>

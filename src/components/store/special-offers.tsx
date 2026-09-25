@@ -41,7 +41,7 @@ function useCountdown() {
 
 export function SpecialOffers({ offers }: SpecialOffersProps) {
   const addItem = useCartStore((s) => s.addItem);
-  const { toast } = useToast();
+  const { success: showSuccess } = useToast();
   const { h, m, s } = useCountdown();
 
   if (offers.length === 0) return null;
@@ -73,7 +73,7 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
       price: p.price,
       image: p.images?.[0]?.url || "/logo.png",
     });
-    toast("تمت إضافة المنتج إلى السلة", "success");
+    showSuccess("تمت إضافة المنتج إلى السلة");
   };
 
   return (

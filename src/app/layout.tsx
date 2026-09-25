@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { ToastProvider } from "@/components/ui/toast";
+// Toast notifications handled per-layout
 
 export const metadata: Metadata = {
   title: "Flux Store - متجرك الرقمي الأول",
@@ -40,9 +40,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <ToastProvider>
-          <div className="flex min-h-screen flex-col">{children}</div>
-        </ToastProvider>
+        <div className="flex min-h-screen flex-col">{children}</div>
       </body>
     </html>
   );

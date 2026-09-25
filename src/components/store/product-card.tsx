@@ -45,7 +45,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const toggle = useWishlistStore((s) => s.toggle);
   const isInWishlist = useWishlistStore((s) => s.isInWishlist(product.id));
-  const { toast } = useToast();
+  const { success } = useToast();
 
   const primaryImage = product.images?.[0];
   const hasDiscount =
@@ -83,17 +83,14 @@ export function ProductCard({ product, className }: ProductCardProps) {
       price: product.price,
       image: primaryImage?.url || "/logo.png",
     });
-    toast("تمت الإضافة إلى السلة", "success");
+    success("تمت الإضافة إلى السلة");
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     toggle(product.id);
-    toast(
-      isInWishlist ? "أُزيلت من المفضلة" : "أُضيفت إلى المفضلة",
-      "success"
-    );
+    success(isInWishlist ? "أُزيلت من المفضلة" : "أُضيفت إلى المفضلة");
   };
 
   return (

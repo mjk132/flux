@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
+import { useThemeStore } from "@/store/theme";
 import { AdminSidebar } from "./admin-sidebar";
 import { AdminTopbar } from "./admin-topbar";
 
@@ -13,6 +14,7 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
+  const { theme } = useThemeStore();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -31,7 +33,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-near-black">
+    <div className={`flex h-screen overflow-hidden ${theme === "dark" ? "flux-dark" : "flux-light"}`}>
       <AdminSidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <AdminTopbar />

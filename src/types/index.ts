@@ -18,7 +18,7 @@ import type {
   Setting as PrismaSetting,
   Session as PrismaSession,
   AuditLog as PrismaAuditLog,
-} from "@/generated/prisma";
+} from "../generated/prisma/client";
 
 // ─── DB Model Types ─────────────────────────────────────────────────────────
 

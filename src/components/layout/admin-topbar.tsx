@@ -34,7 +34,7 @@ export function AdminTopbar() {
   return (
     <header
       dir="rtl"
-      className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-near-black/80 px-6 backdrop-blur-md"
+      className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-[var(--color-near-black)]/80 px-6 backdrop-blur-md"
     >
       {/* Search */}
       <form onSubmit={handleSearch} className="flex items-center">

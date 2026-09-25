@@ -214,6 +214,98 @@ body.flux-light::-webkit-scrollbar-thumb:hover {
   background: #1a63e6;
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   FLUX DARK MODE  (for storefront when user toggles to dark)
+   The dark palette is the original design; we add a .flux-dark scope
+   so the theme toggle can switch between light/dark on the storefront.
+   Admin keeps the dark tokens (separate layout, outside the scope).
+   ════════════════════════════════════════════════════════════════════ */
+
+.flux-dark {
+  --color-void: #04020a;
+  --color-near-black: #06030c;
+  --color-dark-purple: #0a0614;
+  --color-deep-purple: #100a1c;
+  --color-surface: #0e0817;
+  --color-surface-raised: #160e26;
+  --color-grape: #1d1333;
+  --color-border: #1c1330;
+  --color-border-subtle: #141025;
+  --color-white: #f6f3ff;
+  --color-gray-text: #a293c4;
+  --color-gray-muted: #6f6394;
+  --color-faint: #463d63;
+  --color-purple-accent: #2f7bff;
+  --color-violet: #5aa2ff;
+  --color-amethyst: #9cc2ff;
+  --color-danger: #f43f5e;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-info: #60a5fa;
+}
+
+body.flux-dark {
+  background-color: #04020a;
+  color: #f6f3ff;
+}
+
+body.flux-dark::-webkit-scrollbar-track {
+  background: #04020a;
+}
+
+body.flux-dark::-webkit-scrollbar-thumb {
+  background: #1c1330;
+}
+
+body.flux-dark::-webkit-scrollbar-thumb:hover {
+  background: #2f7bff;
+}
+
+/* Gradient headline — original blue gradient on dark backgrounds */
+.flux-dark .text-gradient {
+  background: linear-gradient(120deg, #ffffff 0%, #cfe2ff 55%, #5aa2ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Fine grid — original on dark */
+.flux-dark .bg-grid {
+  background-image:
+    linear-gradient(rgba(47, 123, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 123, 255, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 40%, transparent 100%);
+}
+
+/* Solid tinted chips / badges / buttons keep white glyphs on dark */
+.flux-dark [class~="bg-purple-accent"],
+.flux-dark [class~="bg-danger"],
+.flux-dark [class~="bg-success"],
+.flux-dark [class~="bg-warning"],
+.flux-dark [class~="bg-info"] {
+  color: #ffffff;
+}
+
+/* Keep them solid blue on hover */
+.flux-dark [class~="bg-purple-accent"]:hover {
+  background-color: #1a63e6;
+}
+
+/* Saturated gradient boxes that carry white glyphs */
+.flux-dark [class*="from-purple-accent"][class*="to-violet"],
+.flux-dark [class*="from-amber-500"][class*="to-orange-500"] {
+  color: #ffffff;
+}
+
+/* Ensure flux-light overrides flux-dark when both present (light takes precedence) */
+.flux-light.flux-dark {
+  background-color: #f4f7fc;
+  color: #101828;
+}
+
 /* Gradient headline — readable blue gradient on light backgrounds */
 .flux-light .text-gradient {
   background: linear-gradient(120deg, #1a63e6 0%, #2f7bff 55%, #0ea5e9 100%);

@@ -12,7 +12,7 @@
 
 import "dotenv/config";
 import { Client, Events, GatewayIntentBits } from "discord.js";
-import { PrismaClient } from "../src/generated/prisma";
+import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 
 const ADMINS_SETTING_KEY = "discord_admin_ids";
