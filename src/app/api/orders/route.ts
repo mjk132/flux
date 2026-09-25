@@ -247,12 +247,49 @@ export async function POST(req: NextRequest) {
         }
 
         if (product.productType === "DIGITAL") {
-          const inventoryItems = await tx.$queryRaw<
-            Array<{ id: string }>
-          >`UPDATE "Inventory" SET "status" = 'USED', "orderId" = ${newOrder.id}, "usedAt" = NOW() WHERE "id" IN (SELECT "id" FROM "Inventory" WHERE "productId" = ${item.productId} AND "status" = 'AVAILABLE' LIMIT ${item.quantity} FOR UPDATE SKIP LOCKED) RETURNING "id"`;
+          /* Hand this order its digital codes.
 
-          if (inventoryItems.length < item.quantity) {
-            throw new Error(`Not enough digital codes available for ${product.name}`);
+             This used to be a single raw statement written for PostgreSQL —
+             `NOW()` and `FOR UPDATE SKIP LOCKED` don't exist in SQLite, which
+             is what the datasource actually is — so it failed to parse (the
+             error pointed at `FOR`, column 179) and took the whole order
+             transaction down with it: no digital product could ever be
+             purchased.
+
+             Two portable calls replace it. The transaction already holds the
+             write lock from the stock decrement above, so nothing can claim
+             codes between these steps.
+
+             A product with no code pool at all has nothing to hand out and
+             still sells (most digital goods here aren't licence keys). A
+             product that *does* have a pool must be able to fill the order,
+             otherwise the customer pays for codes that were never issued —
+             so an exhausted pool still aborts the order. */
+          const poolSize = await tx.inventory.count({
+            where: { productId: item.productId },
+          });
+
+          if (poolSize > 0) {
+            const codes = await tx.inventory.findMany({
+              where: { productId: item.productId, status: "AVAILABLE" },
+              take: item.quantity,
+              select: { id: true },
+            });
+
+            if (codes.length < item.quantity) {
+              throw new Error(
+                `Not enough digital codes available for ${product.name}`
+              );
+            }
+
+            await tx.inventory.updateMany({
+              where: { id: { in: codes.map((code) => code.id) } },
+              data: {
+                status: "USED",
+                orderId: newOrder.id,
+                usedAt: new Date(),
+              },
+            });
           }
         }
       }
