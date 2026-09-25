@@ -177,12 +177,12 @@ export function HeroSection() {
             {/* Main image card */}
             <div className="relative z-[5] mx-auto w-[88%] sm:w-[80%]">
               <div className="rounded-[28px] bg-surface p-2 shadow-[0_30px_80px_-20px_rgba(47,123,255,0.45)] ring-1 ring-border">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[20px] bg-gradient-to-br from-blue-100 to-indigo-100">
+                <div className="relative aspect-square overflow-hidden rounded-[20px] bg-gradient-to-br from-blue-100 to-indigo-100">
                   <Image
-                    src="/flux-welcome.png"
+                    src="/flux-welcome-square.webp"
                     alt="Flux Store"
                     fill
-                    sizes="(max-width: 768px) 90vw, 480px"
+                    sizes="(max-width: 768px) 88vw, (max-width: 1024px) 80vw, 520px"
                     className="object-cover"
                     priority
                   />
