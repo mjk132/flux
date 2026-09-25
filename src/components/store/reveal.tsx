@@ -3,14 +3,42 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
+type RevealVariant = "up" | "down" | "left" | "right" | "scale" | "blur" | "fade";
+
 interface RevealProps {
   children: React.ReactNode;
   className?: string;
+  /** Stagger delay in ms (use ~80ms steps for a cascading feel). */
   delay?: number;
-  as?: keyof React.JSX.IntrinsicElements;
+  /** Entrance direction. Defaults to "up". */
+  variant?: RevealVariant;
+  /** Transition duration in ms. Defaults to 700. */
+  duration?: number;
 }
 
-export function Reveal({ children, className, delay = 0 }: RevealProps) {
+const hiddenByVariant: Record<RevealVariant, string> = {
+  up: "translate-y-6 opacity-0",
+  down: "-translate-y-6 opacity-0",
+  left: "translate-x-6 opacity-0",
+  right: "-translate-x-6 opacity-0",
+  scale: "scale-95 opacity-0",
+  blur: "translate-y-4 opacity-0 blur-[6px]",
+  fade: "opacity-0",
+};
+
+/**
+ * Scroll-reveal wrapper: fades/slides children in the first time they
+ * enter the viewport, then disconnects. Honours the OS "reduce motion"
+ * setting automatically (the global reduced-motion rule snaps the
+ * transition to its end state).
+ */
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  variant = "up",
+  duration = 700,
+}: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -39,12 +67,17 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
   return (
     <div
       ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={{
+        transitionDelay: `${delay}ms`,
+        transitionDuration: `${duration}ms`,
+        // Once revealed, drop the transform entirely so the element
+        // stops being a containing block (keeps fixed/sticky inside
+        // working) and releases its compositing layer.
+        ...(visible ? { transform: "none" } : null),
+      }}
       className={cn(
-        "transition-all duration-700 ease-out will-change-transform",
-        visible
-          ? "translate-y-0 opacity-100"
-          : "translate-y-6 opacity-0",
+        "transition-all ease-[cubic-bezier(0.16,1,0.3,1)]",
+        visible ? "opacity-100" : hiddenByVariant[variant],
         className
       )}
     >

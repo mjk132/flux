@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search, Bell, ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -52,6 +53,9 @@ export function AdminTopbar() {
 
       {/* Actions */}
       <div className="flex items-center gap-3">
+        {/* Theme */}
+        <ThemeToggle />
+
         {/* Notifications */}
         <button
           type="button"
@@ -59,9 +63,6 @@ export function AdminTopbar() {
           aria-label="الإشعارات"
         >
           <Bell className="h-5 w-5" />
-          <span className="absolute left-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger text-[10px] font-bold text-white">
-            3
-          </span>
         </button>
 
         {/* User menu */}

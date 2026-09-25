@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @theme {
   /* ─── FLUX Palette: layered darks, blue as accent ─── */
@@ -31,9 +32,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Body always derives from the active palette. The theme scope
+   (`.flux-light` / `.flux-dark`) lives on <html> only, so these
+   variables — and therefore the page background & default text —
+   follow the toggle everywhere, including Radix portals. */
 body {
-  background-color: #04020a;
-  color: #f6f3ff;
+  background-color: var(--color-void);
+  color: var(--color-white);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -52,16 +57,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #04020a;
+  background: var(--color-void);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1c1330;
+  background: var(--color-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2f7bff;
+  background: var(--color-purple-accent);
 }
 
 /* ─── Utilities ─── */
@@ -137,12 +142,13 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   FLUX LIGHT MODE  (scoped: full storefront via `.flux-light` on the
-   store layout root)
+   FLUX LIGHT MODE
    The palette is emitted as real CSS variables (@theme), so this scope
    re-maps the whole dark design system to a light one for every
-   customer-facing page, the navbar and the footer. Admin keeps the
-   dark tokens (separate layout, outside the scope).
+   customer-facing page, the admin shell, the navbar and the footer.
+   The class is set on <html> only (by the pre-paint script + theme
+   store) — never on a layout wrapper, or nested scopes fight each
+   other and the toggle appears to do nothing.
    ════════════════════════════════════════════════════════════════════ */
 
 .flux-light {
@@ -194,31 +200,10 @@ body {
   --color-info: #60a5fa;
 }
 
-/* Mirror the light theme onto <body> itself (LightScope adds the class
-   at runtime) so the page background, default text and scrollbars match
-   the light storefront instead of the hardcoded dark body styles. */
-body.flux-light {
-  background-color: #f4f7fc;
-  color: #101828;
-}
-
-body.flux-light::-webkit-scrollbar-track {
-  background: #f4f7fc;
-}
-
-body.flux-light::-webkit-scrollbar-thumb {
-  background: #c6d4ee;
-}
-
-body.flux-light::-webkit-scrollbar-thumb:hover {
-  background: #1a63e6;
-}
-
 /* ════════════════════════════════════════════════════════════════════
-   FLUX DARK MODE  (for storefront when user toggles to dark)
-   The dark palette is the original design; we add a .flux-dark scope
-   so the theme toggle can switch between light/dark on the storefront.
-   Admin keeps the dark tokens (separate layout, outside the scope).
+   FLUX DARK MODE — the original dark palette, applied as `flux-dark`
+   on <html> when the user picks dark. Both scopes live on <html> only,
+   so nested wrappers (store layout, admin shell) can never fight it.
    ════════════════════════════════════════════════════════════════════ */
 
 .flux-dark {
@@ -242,23 +227,6 @@ body.flux-light::-webkit-scrollbar-thumb:hover {
   --color-success: #34d399;
   --color-warning: #fbbf24;
   --color-info: #60a5fa;
-}
-
-body.flux-dark {
-  background-color: #04020a;
-  color: #f6f3ff;
-}
-
-body.flux-dark::-webkit-scrollbar-track {
-  background: #04020a;
-}
-
-body.flux-dark::-webkit-scrollbar-thumb {
-  background: #1c1330;
-}
-
-body.flux-dark::-webkit-scrollbar-thumb:hover {
-  background: #2f7bff;
 }
 
 /* Gradient headline — original blue gradient on dark backgrounds */
@@ -300,12 +268,6 @@ body.flux-dark::-webkit-scrollbar-thumb:hover {
   color: #ffffff;
 }
 
-/* Ensure flux-light overrides flux-dark when both present (light takes precedence) */
-.flux-light.flux-dark {
-  background-color: #f4f7fc;
-  color: #101828;
-}
-
 /* Gradient headline — readable blue gradient on light backgrounds */
 .flux-light .text-gradient {
   background: linear-gradient(120deg, #1a63e6 0%, #2f7bff 55%, #0ea5e9 100%);
@@ -343,4 +305,101 @@ body.flux-dark::-webkit-scrollbar-thumb:hover {
 .flux-light [class*="from-purple-accent"][class*="to-violet"],
 .flux-light [class*="from-amber-500"][class*="to-orange-500"] {
   color: #ffffff;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   MOTION — shared easing, entrances, theme cross-fade, reduced motion
+   ════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+@keyframes flux-fade-up {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes flux-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes flux-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes flux-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Entrance helpers — use inline `animation-delay` for staggering */
+.animate-flux-up {
+  animation: flux-fade-up 0.7s var(--ease-out-expo) both;
+}
+.animate-flux-in {
+  animation: flux-fade-in 0.45s ease both;
+}
+.animate-flux-pop {
+  animation: flux-scale-in 0.4s var(--ease-out-expo) both;
+}
+
+/* Route-change fade, driven by <RouteFade> (re-keys on pathname) */
+.flux-page-enter {
+  animation: flux-fade-up 0.5s var(--ease-out-expo) both;
+}
+
+/* Skeleton shimmer that follows the active palette */
+.flux-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.flux-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-grape) 90%, var(--color-white)),
+    transparent
+  );
+  animation: flux-shimmer 1.6s ease-in-out infinite;
+}
+
+/* Theme cross-fade fallback for browsers without the View Transitions
+   API. Applied for ~400ms by the theme store around a toggle. */
+html.theme-animating *,
+html.theme-animating *::before,
+html.theme-animating *::after {
+  transition-property: background-color, border-color, color, fill,
+    stroke, box-shadow, outline-color !important;
+  transition-duration: 0.35s !important;
+  transition-timing-function: ease !important;
+}
+
+/* Butter-smooth theme switch where View Transitions are supported */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.35s;
+    animation-timing-function: var(--ease-out-expo);
+  }
+}
+
+/* Respect the OS "reduce motion" setting everywhere */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -165,7 +165,8 @@ export default async function HomePage() {
 
       {/* ═══════════ REAL STATS ═══════════ */}
       <section className="border-b border-border/40 bg-surface/40">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-px px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
+        <Reveal variant="fade" duration={600}>
+          <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-px px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
           {statItems.map((s) => (
             <div
               key={s.label}
@@ -182,7 +183,8 @@ export default async function HomePage() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        </Reveal>
       </section>
 
       {/* ═══════════ FEATURED CATEGORIES ═══════════ */}
@@ -253,9 +255,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </Reveal>
-            <Reveal delay={80}>
-              <ProductGrid products={bestSellers.map(toCard)} />
-            </Reveal>
+            <ProductGrid products={bestSellers.map(toCard)} />
           </div>
         </section>
       )}
@@ -286,27 +286,35 @@ export default async function HomePage() {
                 </Link>
               </div>
             </Reveal>
-            <Reveal delay={80}>
-              <ProductGrid products={featured.map(toCard)} />
-            </Reveal>
+            <ProductGrid products={featured.map(toCard)} />
           </div>
         </section>
       )}
 
       {/* ═══════════ WHY FLUX ═══════════ */}
-      <WhyFluxSection />
+      <Reveal duration={800}>
+        <WhyFluxSection />
+      </Reveal>
 
       {/* ═══════════ HOW IT WORKS ═══════════ */}
-      <HowItWorksSection />
+      <Reveal duration={800}>
+        <HowItWorksSection />
+      </Reveal>
 
       {/* ═══════════ REVIEWS ═══════════ */}
-      <ReviewsSection reviews={reviews} averageRating={averageRating} />
+      <Reveal duration={800}>
+        <ReviewsSection reviews={reviews} averageRating={averageRating} />
+      </Reveal>
 
       {/* ═══════════ FAQ ═══════════ */}
-      <FaqSection faqs={faqs} />
+      <Reveal duration={800}>
+        <FaqSection faqs={faqs} />
+      </Reveal>
 
       {/* ═══════════ DISCORD CTA ═══════════ */}
-      <DiscordCtaSection discordUrl={discordUrl} />
+      <Reveal duration={800}>
+        <DiscordCtaSection discordUrl={discordUrl} />
+      </Reveal>
     </div>
   );
 }

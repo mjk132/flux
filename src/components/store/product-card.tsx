@@ -244,7 +244,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
             onClick={handleAddToCart}
             disabled={outOfStock}
             className={cn(
-              "flex h-9 items-center justify-center gap-1.5 rounded-lg text-[12.5px] font-semibold transition-all",
+              "flex h-9 items-center justify-center gap-1.5 rounded-lg text-[12.5px] font-semibold transition-all duration-200 active:scale-95",
               outOfStock
                 ? "cursor-not-allowed border border-border text-gray-muted"
                 : "bg-purple-accent text-white hover:bg-violet hover:shadow-[0_0_18px_rgba(124,58,237,0.35)]"

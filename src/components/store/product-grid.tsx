@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard, type ProductCardData } from "./product-card";
+import { Reveal } from "./reveal";
 
 interface ProductGridProps {
   products: ProductCardData[];
@@ -57,8 +58,14 @@ export function ProductGrid({ products, loading = false }: ProductGridProps) {
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+      {products.map((product, i) => (
+        <Reveal
+          key={product.id}
+          delay={(i % 4) * 70}
+          className="h-full"
+        >
+          <ProductCard product={product} className="h-full" />
+        </Reveal>
       ))}
     </div>
   );

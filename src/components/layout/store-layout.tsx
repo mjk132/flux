@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { StoreNavbar } from "./store-navbar";
 import { StoreFooter } from "./store-footer";
-import { LightScope } from "./light-scope";
+import { RouteFade } from "./route-fade";
 import { Home, Store, Heart, ShoppingCart, User } from "lucide-react";
 
 interface StoreLayoutProps {
@@ -27,11 +27,14 @@ export async function StoreLayout({ children }: StoreLayoutProps) {
     })
     .catch(() => []);
 
+  // The theme scope lives on <html> (see src/store/theme.ts) — never
+  // hardcode `flux-light` here, it used to override the dark toggle.
   return (
-    <div className="flex min-h-screen flex-col bg-void flux-light">
-      <LightScope />
+    <div className="flex min-h-screen flex-col bg-void">
       <StoreNavbar categories={categories} />
-      <main className="flex-1 pt-[68px] pb-16 lg:pb-0">{children}</main>
+      <main className="flex-1 pt-[68px] pb-16 lg:pb-0">
+        <RouteFade>{children}</RouteFade>
+      </main>
       <StoreFooter categories={categories} />
 
       {/* Mobile bottom navigation */}

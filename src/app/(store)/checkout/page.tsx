@@ -200,7 +200,7 @@ export default function CheckoutPage() {
 
             <div className="mt-4 flex flex-col gap-4 sm:flex-row">
               {paypalQr ? (
-                <div className="relative h-44 w-44 shrink-0 overflow-hidden rounded-xl border border-border bg-[#ffffff]">
+                <div className="relative h-44 w-44 shrink-0 overflow-hidden rounded-xl border border-border bg-surface">
                   <Image
                     src={paypalQr}
                     alt="PayPal QR"

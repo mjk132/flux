@@ -27,7 +27,7 @@ export function DiscordCtaSection({ discordUrl }: DiscordCtaProps) {
             <DiscordLogo className="h-8 w-8 text-[#ffffff]" />
           </div>
 
-          <span className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-[#ffffff]/70 px-3 py-1 text-[11px] font-semibold text-gray-text">
+          <span className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-surface/70 px-3 py-1 text-[11px] font-semibold text-gray-text">
             <span className="h-1.5 w-1.5 rounded-full bg-success" />
             المجتمع مفتوح الآن
           </span>

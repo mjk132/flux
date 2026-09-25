@@ -19,14 +19,12 @@ import {
   User,
   ChevronLeft,
   HelpCircle,
-  Sun,
-  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
 import { useWishlistStore } from "@/store/wishlist";
-import { useThemeStore } from "@/store/theme";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -54,7 +52,6 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
   const { user, isAuthenticated, logout } = useAuthStore();
   const getItemCount = useCartStore((s) => s.getItemCount);
   const wishlistItems = useWishlistStore((s) => s.items);
-  const { theme } = useThemeStore();
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -211,14 +208,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
           {/* Left: actions */}
           <div className="flex items-center gap-0.5 sm:gap-1">
             {/* Theme Toggle */}
-            <button
-              type="button"
-              onClick={() => useThemeStore.getState().toggleTheme()}
-              className="rounded-lg p-2 text-gray-text transition-colors hover:text-white"
-              aria-label="تبديل الوضع"
-            >
-              {theme === "light" ? <Moon className="h-[18px] w-[18px]" /> : <Sun className="h-[18px] w-[18px]" />}
-            </button>
+            <ThemeToggle />
 
             <button
               type="button"
