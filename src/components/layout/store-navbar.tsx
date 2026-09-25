@@ -154,15 +154,15 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
                 key={link.label}
                 href={link.href}
                 className={cn(
-                  "relative rounded-lg px-3.5 py-2 text-[13.5px] font-medium transition-colors",
+                  "relative rounded-full px-3.5 py-2 text-[13.5px] font-medium transition-all duration-300",
                   isActive(link.href)
-                    ? "text-white"
-                    : "text-gray-text hover:text-white"
+                    ? "bg-white/[0.07] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]"
+                    : "text-gray-text hover:bg-white/[0.04] hover:text-white"
                 )}
               >
                 {link.label}
                 {isActive(link.href) && (
-                  <span className="absolute inset-x-3 -bottom-0.5 h-px bg-gradient-to-r from-transparent via-purple-accent to-transparent" />
+                  <span className="absolute inset-x-1/2 -bottom-[3px] h-1 w-1 -translate-x-1/2 rounded-full bg-purple-accent shadow-[0_0_6px_rgba(47,123,255,0.9)]" />
                 )}
               </Link>
             ))}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Zap, ShieldCheck, Headphones, CreditCard } from "lucide-react";
 
 interface FooterCategory {
   slug: string;
@@ -26,6 +27,13 @@ const supportLinks = [
   { href: "/auth/login", label: "تسجيل الدخول" },
 ];
 
+const trust = [
+  { icon: Zap, title: "تسليم فوري", desc: "المنتج يصلك بعد الدفع مباشرة" },
+  { icon: ShieldCheck, title: "ضمان شامل", desc: "استرجاع خلال 3 أيام" },
+  { icon: Headphones, title: "دعم 24/7", desc: "فريق جاهز على ديسكورد" },
+  { icon: CreditCard, title: "دفع آمن", desc: "معاملات مشفّرة وموثوقة" },
+];
+
 function DiscordLogo({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -39,12 +47,12 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
     <footer dir="rtl" className="relative border-t border-border/60 bg-near-black">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-accent/40 to-transparent" />
 
-      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-14">
+      <div className="mx-auto max-w-[1400px] px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="relative h-9 w-9 overflow-hidden rounded-full ring-1 ring-white/10">
+            <Link href="/" className="group inline-flex items-center gap-2.5">
+              <div className="relative h-9 w-9 overflow-hidden rounded-full ring-1 ring-white/10 transition-all duration-300 group-hover:ring-purple-accent/50">
                 <Image
                   src="/logo.png"
                   alt="Flux Store"
@@ -70,7 +78,7 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
               href="https://discord.gg/fluxstore"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-[#5865F2] px-4 text-[13px] font-bold text-[#ffffff] transition-all hover:bg-[#4752c4] hover:shadow-[0_0_20px_rgba(88,101,242,0.4)]"
+              className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-[#5865F2] px-4 text-[13px] font-bold text-[#ffffff] transition-all duration-300 hover:bg-[#4752c4] hover:shadow-[0_0_20px_rgba(88,101,242,0.4)] active:scale-[0.98]"
             >
               <DiscordLogo className="h-5 w-5" />
               انضم على ديسكورد
@@ -79,7 +87,7 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
 
           {/* Navigation */}
           <div>
-            <h3 className="mb-4 text-[12px] font-bold uppercase tracking-wider text-gray-muted">
+            <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
               التصفح
             </h3>
             <ul className="space-y-2.5">
@@ -87,8 +95,9 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
                 <li key={l.label}>
                   <Link
                     href={l.href}
-                    className="text-[13px] text-gray-text transition-colors hover:text-white"
+                    className="group inline-flex items-center gap-2 text-[13px] text-gray-text transition-colors hover:text-white"
                   >
+                    <span className="h-px w-0 bg-purple-accent transition-all duration-300 group-hover:w-3" />
                     {l.label}
                   </Link>
                 </li>
@@ -98,7 +107,7 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
 
           {/* Categories */}
           <div>
-            <h3 className="mb-4 text-[12px] font-bold uppercase tracking-wider text-gray-muted">
+            <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
               الأقسام
             </h3>
             <ul className="space-y-2.5">
@@ -106,8 +115,9 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
                 <li key={cat.slug}>
                   <Link
                     href={`/store?category=${cat.slug}`}
-                    className="text-[13px] text-gray-text transition-colors hover:text-white"
+                    className="group inline-flex items-center gap-2 text-[13px] text-gray-text transition-colors hover:text-white"
                   >
+                    <span className="h-px w-0 bg-purple-accent transition-all duration-300 group-hover:w-3" />
                     {cat.nameAr || cat.name}
                   </Link>
                 </li>
@@ -117,7 +127,7 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
 
           {/* Support */}
           <div>
-            <h3 className="mb-4 text-[12px] font-bold uppercase tracking-wider text-gray-muted">
+            <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
               الدعم
             </h3>
             <ul className="space-y-2.5">
@@ -128,15 +138,17 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
                       href={l.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[13px] text-gray-text transition-colors hover:text-white"
+                      className="group inline-flex items-center gap-2 text-[13px] text-gray-text transition-colors hover:text-white"
                     >
+                      <span className="h-px w-0 bg-purple-accent transition-all duration-300 group-hover:w-3" />
                       {l.label}
                     </a>
                   ) : (
                     <Link
                       href={l.href}
-                      className="text-[13px] text-gray-text transition-colors hover:text-white"
+                      className="group inline-flex items-center gap-2 text-[13px] text-gray-text transition-colors hover:text-white"
                     >
+                      <span className="h-px w-0 bg-purple-accent transition-all duration-300 group-hover:w-3" />
                       {l.label}
                     </Link>
                   )}
@@ -146,15 +158,50 @@ export function StoreFooter({ categories = [] }: StoreFooterProps) {
           </div>
         </div>
 
+        {/* Trust strip */}
+        <div className="mt-12 grid grid-cols-2 gap-3 rounded-2xl border border-border/70 bg-surface/60 p-4 sm:grid-cols-4 sm:gap-4">
+          {trust.map((t) => (
+            <div key={t.title} className="flex items-start gap-3 px-1 py-1.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-accent/10 ring-1 ring-purple-accent/20">
+                <t.icon className="h-4.5 w-4.5 text-purple-accent" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-white">{t.title}</p>
+                <p className="truncate text-[11.5px] text-gray-muted">{t.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border/50 pt-6 sm:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-6 sm:flex-row">
           <p className="text-[12px] text-gray-muted">
             &copy; {new Date().getFullYear()} Flux Store. جميع الحقوق محفوظة.
           </p>
-          <div className="flex items-center gap-5">
-            <span className="text-[12px] text-gray-muted">شروط الاستخدام</span>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <Link
+              href="/terms"
+              className="text-[12px] text-gray-muted transition-colors hover:text-white"
+            >
+              شروط الاستخدام
+            </Link>
             <span className="h-3 w-px bg-border" />
-            <span className="text-[12px] text-gray-muted">سياسة الخصوصية</span>
+            <Link
+              href="/privacy"
+              className="text-[12px] text-gray-muted transition-colors hover:text-white"
+            >
+              سياسة الخصوصية
+            </Link>
+            <span className="h-3 w-px bg-border" />
+            <a
+              href="https://discord.gg/fluxstore"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="ديسكورد"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-gray-text transition-all duration-200 hover:border-[#5865F2]/50 hover:text-[#5865F2]"
+            >
+              <DiscordLogo className="h-4 w-4" />
+            </a>
           </div>
         </div>
       </div>

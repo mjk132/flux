@@ -1,10 +1,8 @@
-import Link from "next/link";
 import {
   Package,
   LayoutGrid,
   MessageSquareQuote,
   Star,
-  ArrowLeft,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -18,6 +16,7 @@ import { ReviewsSection } from "@/components/store/reviews-section";
 import { FaqSection } from "@/components/store/faq-section";
 import { DiscordCtaSection } from "@/components/store/discord-cta";
 import { Reveal } from "@/components/store/reveal";
+import { SectionHeading } from "@/components/store/section-heading";
 import type { ProductCardData } from "@/components/store/product-card";
 
 export const dynamic = "force-dynamic";
@@ -191,23 +190,13 @@ export default async function HomePage() {
       {categoriesGrid.length > 0 && (
         <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
           <Reveal>
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
-                  تصفح حسب القسم
-                </p>
-                <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                  كل أقسام ديسكورد في مكان واحد
-                </h2>
-              </div>
-              <Link
-                href="/store"
-                className="group inline-flex items-center gap-1.5 text-[13px] font-semibold text-purple-accent transition-colors hover:text-violet"
-              >
-                كل الأقسام
-                <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
-              </Link>
-            </div>
+            <SectionHeading
+              eyebrow="تصفح حسب القسم"
+              title="كل أقسام ديسكورد في مكان واحد"
+              description="اختر القسم الذي يناسب احتياجك وابدأ خلال دقائق — كل المنتجات منظّمة ومرتبة."
+              href="/store"
+              actionLabel="كل الأقسام"
+            />
           </Reveal>
           <Reveal delay={80}>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -237,23 +226,12 @@ export default async function HomePage() {
         <section className="border-y border-border/40 bg-surface/30">
           <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
             <Reveal>
-              <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
-                    اختيارات مضمونة
-                  </p>
-                  <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                    الأكثر مبيعاً
-                  </h2>
-                </div>
-                <Link
-                  href="/store?bestseller=true"
-                  className="group inline-flex items-center gap-1.5 text-[13px] font-semibold text-purple-accent transition-colors hover:text-violet"
-                >
-                  عرض الكل
-                  <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
-                </Link>
-              </div>
+              <SectionHeading
+                eyebrow="اختيارات مضمونة"
+                title="الأكثر مبيعاً"
+                description="منتجات نالت ثقة عملائنا فعلياً وتُكرَّر طلباتها يومياً."
+                href="/store?sort=best-selling"
+              />
             </Reveal>
             <ProductGrid products={bestSellers.map(toCard)} />
           </div>
@@ -268,23 +246,12 @@ export default async function HomePage() {
         <section className="border-t border-border/40">
           <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
             <Reveal>
-              <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
-                    مختارات المحررين
-                  </p>
-                  <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                    منتجات مميزة
-                  </h2>
-                </div>
-                <Link
-                  href="/store?featured=true"
-                  className="group inline-flex items-center gap-1.5 text-[13px] font-semibold text-purple-accent transition-colors hover:text-violet"
-                >
-                  عرض الكل
-                  <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
-                </Link>
-              </div>
+              <SectionHeading
+                eyebrow="مختارات المحررين"
+                title="منتجات مميزة"
+                description="أفضل ما نقدمه هذا الموسم، مختار بعناية لجودته وقيمته."
+                href="/store"
+              />
             </Reveal>
             <ProductGrid products={featured.map(toCard)} />
           </div>
