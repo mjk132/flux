@@ -6,6 +6,7 @@ import { ShoppingCart, Zap, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
+import { getSalePrice } from "@/lib/pricing";
 
 interface ProductInfo {
   id: string;
@@ -24,10 +25,7 @@ export default function ProductDetailClient({ product }: { product: ProductInfo 
   const addItem = useCartStore((s) => s.addItem);
   const router = useRouter();
 
-  const finalPrice =
-    product.discount > 0
-      ? product.price * (1 - product.discount / 100)
-      : product.price;
+  const finalPrice = getSalePrice(product).final;
 
   const handleAddToCart = () => {
     addItem({

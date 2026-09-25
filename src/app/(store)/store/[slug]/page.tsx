@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
+import { getSalePrice } from "@/lib/pricing";
 import type { Metadata } from "next";
 import { Star, ChevronLeft, Package } from "lucide-react";
 import ProductDetailClient from "./product-detail-client";
@@ -84,10 +85,10 @@ export default async function ProductDetailPage({ params }: Props) {
         product.reviews.length
       : 0;
 
-  const finalPrice =
-    product.discount > 0
-      ? product.price * (1 - product.discount / 100)
-      : product.price;
+  // Charged price, struck-through "was" price and badge percentage all come
+  // from the one helper the product card and the checkout also use.
+  const sale = getSalePrice(product);
+  const finalPrice = sale.final;
 
   const relatedProducts = await prisma.product.findMany({
     where: {
@@ -141,9 +142,9 @@ export default async function ProductDetailPage({ params }: Props) {
                 <Package className="h-24 w-24" />
               </div>
             )}
-            {product.discount > 0 && (
+            {sale.percent > 0 && (
               <span className="absolute right-4 top-4 rounded-full bg-danger px-3 py-1 text-sm font-bold text-white">
-                -{Math.round(product.discount)}%
+                -{sale.percent}%
               </span>
             )}
           </div>
@@ -199,9 +200,9 @@ export default async function ProductDetailPage({ params }: Props) {
             <span className="text-3xl font-bold text-purple-accent">
               {formatPrice(finalPrice)}
             </span>
-            {product.discount > 0 && (
+            {sale.was !== null && (
               <span className="text-lg text-gray-text line-through">
-                {formatPrice(product.price)}
+                {formatPrice(sale.was)}
               </span>
             )}
           </div>
@@ -371,8 +372,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   ? p.reviews.reduce((s, r) => s + r.rating, 0) /
                     p.reviews.length
                   : 0;
-              const pFinal =
-                p.discount > 0 ? p.price * (1 - p.discount / 100) : p.price;
+              const pSale = getSalePrice(p);
 
               return (
                 <Link
@@ -393,9 +393,9 @@ export default async function ProductDetailPage({ params }: Props) {
                           <Package className="h-8 w-8" />
                         </div>
                       )}
-                      {p.discount > 0 && (
+                      {pSale.percent > 0 && (
                         <span className="absolute right-2 top-2 rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white">
-                          -{Math.round(p.discount)}%
+                          -{pSale.percent}%
                         </span>
                       )}
                     </div>
@@ -405,11 +405,11 @@ export default async function ProductDetailPage({ params }: Props) {
                       </h3>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-purple-accent">
-                          {formatPrice(pFinal)}
+                          {formatPrice(pSale.final)}
                         </span>
-                        {p.discount > 0 && (
+                        {pSale.was !== null && (
                           <span className="text-xs text-gray-text line-through">
-                            {formatPrice(p.price)}
+                            {formatPrice(pSale.was)}
                           </span>
                         )}
                       </div>

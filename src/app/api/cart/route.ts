@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getSalePrice } from "@/lib/pricing";
 
 function json(data: Record<string, unknown>, status = 200) {
   return NextResponse.json(data, { status });
@@ -46,9 +47,7 @@ export async function POST(req: NextRequest) {
       return json({ success: false, error: "Insufficient stock" }, 400);
     }
 
-    const discountedPrice = product.discount > 0
-      ? product.price * (1 - product.discount / 100)
-      : product.price;
+    const discountedPrice = getSalePrice(product).final;
 
     return json({
       success: true,
@@ -114,9 +113,7 @@ export async function GET(req: NextRequest) {
         if (!product) return null;
 
         const quantity = Math.max(1, Math.min(item.quantity, product.stock));
-        const discountedPrice = product.discount > 0
-          ? product.price * (1 - product.discount / 100)
-          : product.price;
+        const discountedPrice = getSalePrice(product).final;
 
         return {
           product_id: product.id,

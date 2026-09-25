@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { authFetch } from "@/store/auth";
 import { formatPrice, formatDate } from "@/lib/utils";
+import { getSalePrice } from "@/lib/pricing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -100,6 +101,39 @@ const emptyProduct = {
   productType: "DIGITAL",
   images: [] as Array<{ url: string; alt?: string }>,
 };
+
+/* Live preview of what the customer is actually charged. The store keeps
+   price, compare price and discount as three separate fields, and reading
+   them inconsistently is what made a "-50%" badge sit next to an unchanged
+   price on the storefront. Showing the outcome while typing removes the
+   guesswork. */
+function PricePreview({
+  price,
+  comparePrice,
+  discount,
+}: {
+  price: number;
+  comparePrice: number;
+  discount: number;
+}) {
+  const sale = getSalePrice({ price, comparePrice, discount });
+
+  // Nothing to warn about when the customer just pays the listed price.
+  if (sale.was === null) return null;
+
+  return (
+    <div className="col-span-2 rounded-xl border border-purple-accent/25 bg-purple-accent/10 px-3.5 py-2.5 text-[12.5px]">
+      <span className="text-gray-muted">سعر العميل في المتجر: </span>
+      <span className="font-extrabold text-purple-accent">
+        {formatPrice(sale.final)}
+      </span>
+      <span className="mx-2 text-gray-muted line-through">
+        {formatPrice(sale.was)}
+      </span>
+      <span className="font-bold text-danger">-{sale.percent}%</span>
+    </div>
+  );
+}
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -388,6 +422,7 @@ export default function AdminProducts() {
               ) : (
                 products.map((product) => {
                   const st = statusLabels[product.status] || { label: product.status, variant: "default" as const };
+                  const sale = getSalePrice(product);
                   return (
                     <tr key={product.id} className="border-b border-border transition-colors hover:bg-surface/50">
                       <td className="px-4 py-3">
@@ -400,7 +435,14 @@ export default function AdminProducts() {
                       <td className="max-w-[200px] truncate px-4 py-3 font-medium text-white">
                         {product.name}
                       </td>
-                      <td className="px-4 py-3 text-white">{formatPrice(product.price)}</td>
+                      <td className="px-4 py-3 text-white">
+                        {formatPrice(sale.final)}
+                        {sale.was !== null && (
+                          <span className="mr-1.5 text-xs text-gray-muted line-through">
+                            {formatPrice(sale.was)}
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-gray-text">{product.category?.name || "-"}</td>
                       <td className="px-4 py-3">
                         <Badge variant={st.variant}>{st.label}</Badge>
@@ -544,6 +586,11 @@ export default function AdminProducts() {
                 onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value) || 0 })}
               />
             </div>
+            <PricePreview
+              price={form.price}
+              comparePrice={form.comparePrice}
+              discount={form.discount}
+            />
             <Input
               label="SKU"
               value={form.sku}

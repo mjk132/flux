@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Clock, ArrowLeft, ShoppingCart, BadgePercent } from "lucide-react";
 import { cn, formatPrice } from "@/lib/utils";
+import { getSalePrice } from "@/lib/pricing";
 import { ProductVisual } from "./product-visual";
 import { useCartStore } from "@/store/cart";
 import { useToast } from "@/components/ui/toast";
@@ -46,22 +47,15 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
 
   if (offers.length === 0) return null;
 
-  const sorted = [...offers].sort((a, b) => {
-    const da = a.comparePrice && a.comparePrice > a.price
-      ? (a.comparePrice - a.price) / a.comparePrice
-      : (a.discount || 0) / 100;
-    const db = b.comparePrice && b.comparePrice > b.price
-      ? (b.comparePrice - b.price) / b.comparePrice
-      : (b.discount || 0) / 100;
-    return db - da;
-  });
+  // Biggest real saving first, measured the same way the price is charged.
+  const sorted = [...offers].sort(
+    (a, b) => getSalePrice(b).percent - getSalePrice(a).percent
+  );
 
   const featured = sorted[0];
   const rest = sorted.slice(1, 4);
 
-  const featuredDiscount = featured.comparePrice && featured.comparePrice > featured.price
-    ? Math.round(((featured.comparePrice - featured.price) / featured.comparePrice) * 100)
-    : featured.discount || 0;
+  const featuredSale = getSalePrice(featured);
 
   const handleAdd = (p: ProductCardData) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -70,7 +64,7 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
     addItem({
       productId: p.id,
       name: p.name,
-      price: p.price,
+      price: getSalePrice(p).final,
       image: p.images?.[0]?.url || "/logo.png",
     });
     showSuccess("تمت إضافة المنتج إلى السلة");
@@ -125,7 +119,7 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
           <div className="absolute inset-0 bg-grid opacity-60" />
           <div className="relative p-6 sm:p-8">
             <span className="inline-flex items-center gap-1 rounded-full bg-danger px-3 py-1 text-[11px] font-bold text-white shadow-lg shadow-danger/30">
-              خصم يصل إلى {featuredDiscount}%
+              خصم يصل إلى {featuredSale.percent}%
             </span>
             <h3 className="mt-4 text-xl font-extrabold leading-snug text-white sm:text-2xl">
               {featured.nameAr || featured.name}
@@ -135,11 +129,11 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
             </p>
             <div className="mt-4 flex items-center gap-3">
               <span className="text-2xl font-extrabold text-white">
-                {formatPrice(featured.price)}
+                {formatPrice(featuredSale.final)}
               </span>
-              {featured.comparePrice && featured.comparePrice > featured.price && (
+              {featuredSale.was !== null && (
                 <span className="text-sm text-gray-muted line-through">
-                  {formatPrice(featured.comparePrice)}
+                  {formatPrice(featuredSale.was)}
                 </span>
               )}
             </div>
@@ -163,9 +157,7 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
         {/* Other offers list */}
         <div className="space-y-3 lg:col-span-3">
           {rest.map((offer) => {
-            const discount = offer.comparePrice && offer.comparePrice > offer.price
-              ? Math.round(((offer.comparePrice - offer.price) / offer.comparePrice) * 100)
-              : offer.discount || 0;
+            const sale = getSalePrice(offer);
             return (
               <Link
                 key={offer.id}
@@ -179,9 +171,9 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
                     imageUrl={offer.images?.[0]?.url}
                     className="object-cover"
                   />
-                  {discount > 0 && (
+                  {sale.percent > 0 && (
                     <span className="absolute right-1 top-1 rounded bg-danger px-1.5 py-0.5 text-[9px] font-bold text-white">
-                      -{discount}%
+                      -{sale.percent}%
                     </span>
                   )}
                 </div>
@@ -191,11 +183,11 @@ export function SpecialOffers({ offers }: SpecialOffersProps) {
                   </h4>
                   <div className="mt-1 flex items-center gap-2">
                     <span className="text-[15px] font-extrabold text-purple-accent">
-                      {formatPrice(offer.price)}
+                      {formatPrice(sale.final)}
                     </span>
-                    {offer.comparePrice && offer.comparePrice > offer.price && (
+                    {sale.was !== null && (
                       <span className="text-[11px] text-gray-muted line-through">
-                        {formatPrice(offer.comparePrice)}
+                        {formatPrice(sale.was)}
                       </span>
                     )}
                   </div>

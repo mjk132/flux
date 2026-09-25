@@ -6,6 +6,7 @@ import { Heart, Trash2, Package } from "lucide-react";
 import { useWishlistStore } from "@/store/wishlist";
 import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
+import { getSalePrice } from "@/lib/pricing";
 
 interface Product {
   id: string;
@@ -13,6 +14,7 @@ interface Product {
   nameAr: string | null;
   slug: string;
   price: number;
+  comparePrice?: number | null;
   discount: number;
   images: { url: string }[];
   category: { name: string };
@@ -55,14 +57,10 @@ export default function WishlistPage() {
   }, [items]);
 
   const handleAddToCart = (product: Product) => {
-    const finalPrice =
-      product.discount > 0
-        ? product.price * (1 - product.discount / 100)
-        : product.price;
     addItem({
       productId: product.id,
       name: product.nameAr || product.name,
-      price: finalPrice,
+      price: getSalePrice(product).final,
       image: product.images[0]?.url || "",
     });
   };
@@ -100,10 +98,7 @@ export default function WishlistPage() {
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {products.map((product) => {
-            const finalPrice =
-              product.discount > 0
-                ? product.price * (1 - product.discount / 100)
-                : product.price;
+            const sale = getSalePrice(product);
 
             return (
               <div
@@ -123,9 +118,9 @@ export default function WishlistPage() {
                         <Package className="h-12 w-12" />
                       </div>
                     )}
-                    {product.discount > 0 && (
+                    {sale.percent > 0 && (
                       <span className="absolute right-2 top-2 rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white">
-                        -{Math.round(product.discount)}%
+                        -{sale.percent}%
                       </span>
                     )}
                   </div>
@@ -143,11 +138,11 @@ export default function WishlistPage() {
 
                   <div className="mb-3 flex items-center gap-2">
                     <span className="text-sm font-bold text-purple-accent">
-                      {formatPrice(finalPrice)}
+                      {formatPrice(sale.final)}
                     </span>
-                    {product.discount > 0 && (
+                    {sale.was !== null && (
                       <span className="text-xs text-gray-text line-through">
-                        {formatPrice(product.price)}
+                        {formatPrice(sale.was)}
                       </span>
                     )}
                   </div>

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth";
 import { revalidateStorefront } from "@/lib/storefront-cache";
 import { generateOrderNumber } from "@/lib/utils";
+import { getSalePrice } from "@/lib/pricing";
 import {
   storeImage,
   MAX_IMAGE_BYTES,
@@ -144,9 +145,9 @@ export async function POST(req: NextRequest) {
         return json({ success: false, error: `Insufficient stock for ${product.name}` }, 400);
       }
 
-      const price = product.discount > 0
-        ? product.price * (1 - product.discount / 100)
-        : product.price;
+      // What the customer is actually charged — same helper the product
+      // card displays, so the advertised price and the invoiced price agree.
+      const price = getSalePrice(product).final;
       const total = Math.round(price * quantity * 100) / 100;
       subtotal += total;
 

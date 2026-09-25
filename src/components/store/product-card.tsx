@@ -13,6 +13,7 @@ import { useCartStore } from "@/store/cart";
 import { useWishlistStore } from "@/store/wishlist";
 import { useToast } from "@/components/ui/toast";
 import { cn, formatPrice } from "@/lib/utils";
+import { getSalePrice } from "@/lib/pricing";
 import { ProductVisual } from "./product-visual";
 
 export interface ProductCardData {
@@ -48,15 +49,11 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const { success } = useToast();
 
   const primaryImage = product.images?.[0];
-  const hasDiscount =
-    product.comparePrice && product.comparePrice > product.price;
-  const discountPercent = hasDiscount
-    ? Math.round(
-        ((product.comparePrice! - product.price) / product.comparePrice!) * 100
-      )
-    : product.discount && product.discount > 0
-      ? Math.round(product.discount)
-      : 0;
+  // The card previously showed `price` untouched while still printing the
+  // discount badge, so a 50%-off product looked like it cost full price.
+  // Everything now comes from the same helper checkout uses.
+  const { final: salePrice, was: wasPrice, percent: discountPercent } =
+    getSalePrice(product);
 
   const isNew =
     product.createdAt &&
@@ -80,7 +77,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
     addItem({
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: salePrice,
       image: primaryImage?.url || "/logo.png",
     });
     success("تمت الإضافة إلى السلة");
@@ -222,11 +219,11 @@ export function ProductCard({ product, className }: ProductCardProps) {
         <div className="mt-3 flex flex-1 items-end justify-between">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <span className="text-[18px] font-extrabold tracking-tight text-white">
-              {formatPrice(product.price)}
+              {formatPrice(salePrice)}
             </span>
-            {hasDiscount && (
+            {wasPrice !== null && (
               <span className="text-[12px] text-gray-muted line-through">
-                {formatPrice(product.comparePrice!)}
+                {formatPrice(wasPrice)}
               </span>
             )}
           </div>
