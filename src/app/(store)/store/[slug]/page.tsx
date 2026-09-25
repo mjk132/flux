@@ -6,10 +6,24 @@ import type { Metadata } from "next";
 import { Star, ChevronLeft, Package } from "lucide-react";
 import ProductDetailClient from "./product-detail-client";
 
-export const dynamic = "force-dynamic";
+// Static + ISR. Product pages are prerendered for every published slug at
+// build (see generateStaticParams), so the router prefetches them in full and
+// navigating is instant. A slug created after the build is rendered on first
+// visit and cached from then on.
+export const revalidate = 60;
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+/** Every published product gets its own static page at build time. */
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    where: { status: "PUBLISHED" },
+    select: { slug: true },
+    orderBy: { createdAt: "desc" },
+  });
+  return products.map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

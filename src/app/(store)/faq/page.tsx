@@ -2,7 +2,9 @@ import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import FAQAccordion from "./faq-accordion";
 
-export const dynamic = "force-dynamic";
+// Static + ISR: prerendered at build, served from the CDN, refreshed in the
+// background every minute. Also makes the route fully prefetchable.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "الأسئلة الشائعة | Flux Store",

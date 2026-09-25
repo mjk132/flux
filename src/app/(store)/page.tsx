@@ -19,7 +19,13 @@ import { Reveal } from "@/components/store/reveal";
 import { SectionHeading } from "@/components/store/section-heading";
 import type { ProductCardData } from "@/components/store/product-card";
 
-export const dynamic = "force-dynamic";
+/* Prerendered at build + ISR instead of `force-dynamic`.
+   Rendering this page on every request cost ~3.2s (always cache MISS) and
+   meant the router could never prefetch it, so going *back* to the homepage
+   re-rendered it server-side. With `revalidate` it ships from the CDN in
+   ~60ms and Next prefetches it in full (5 min client cache). Content still
+   refreshes in the background every minute. */
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Flux Store - حلول رقمية بهوية مختلفة",
