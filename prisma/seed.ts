@@ -14,6 +14,20 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 async function main() {
+  // Safety: never wipe the production (Turso) database by accident.
+  // Demo data is for local development only.
+  if (
+    (process.env.DATABASE_URL || "").startsWith("libsql://") &&
+    process.env.ALLOW_PRODUCTION_SEED !== "yes"
+  ) {
+    console.error(
+      "Refusing to seed: DATABASE_URL points at a remote (production) database.\n" +
+        "Seeding would DELETE all existing data.\n" +
+        "If you really mean it, rerun with ALLOW_PRODUCTION_SEED=yes"
+    );
+    process.exit(1);
+  }
+
   console.log("Starting seed...\n");
 
   // Clear existing data

@@ -234,6 +234,22 @@ export default function AdminDashboard() {
         />
       </div>
 
+      {/* No-data hint — shown only until the first real order arrives */}
+      {data.totalOrders === 0 && (
+        <Card className="border-purple-accent/30 bg-purple-accent/5">
+          <div className="flex items-start gap-3">
+            <Zap className="mt-0.5 h-5 w-5 shrink-0 text-purple-accent" />
+            <div>
+              <p className="font-medium text-white">المتجر على وشك البدء</p>
+              <p className="text-sm text-gray-text">
+                هذه أرقام حقيقية من قاعدة البيانات. لا توجد طلبات بعد، لذلك
+                الإيرادات والطلبات صفر — ستتحدث تلقائياً فور أول عملية شراء.
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Low stock alert */}
       {data.lowStockProducts.length > 0 && (
         <Card className="border-warning/30 bg-warning/5">
