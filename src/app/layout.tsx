@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ToastContainer } from "@/components/ui/toast";
+import { SessionSync } from "@/components/layout/session-sync";
 
 export const metadata: Metadata = {
   title: "FLUX — منتجات رقمية وتطوير مخصص",
@@ -57,6 +58,9 @@ export default function RootLayout({
           تخطَّ إلى المحتوى
         </a>
         <div className="flex min-h-screen flex-col">{children}</div>
+        {/* Invisible: refreshes the persisted login (role included) from
+            the server once per page load — see session-sync.tsx. */}
+        <SessionSync />
         {/* Mounted once, above every route: the store's add-to-cart
             feedback and the admin panel's save confirmations both render
             here (see components/ui/toast.tsx). */}

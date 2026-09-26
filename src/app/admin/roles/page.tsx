@@ -14,6 +14,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Shield, Users, Crown, User } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
 
 interface RoleData {
   role: string;
@@ -57,6 +58,7 @@ export default function AdminRoles() {
   const [selectedRole, setSelectedRole] = useState("");
   const [updating, setUpdating] = useState(false);
   const { user: currentUser } = useAuthStore();
+  const { success, error: toastError } = useToast();
 
   const isOwner = currentUser?.role === "OWNER";
 
@@ -86,15 +88,27 @@ export default function AdminRoles() {
     if (!selectedUser || !selectedRole || !isOwner) return;
     setUpdating(true);
     try {
-      await authFetch("/api/admin/roles", {
+      const res = await authFetch("/api/admin/roles", {
         method: "PUT",
         body: JSON.stringify({ userId: selectedUser, role: selectedRole }),
       });
+      if (!res.ok) {
+        // Never fail silently — an unchecked response here is how a role
+        // change looks "done" while nothing was saved.
+        const json = await res.json().catch(() => ({}));
+        toastError("تعذر تغيير الدور", json.error || "حاول مرة أخرى.");
+        return;
+      }
+      const target = users.find((u) => u.id === selectedUser);
+      success(
+        "تم تغيير الدور",
+        `${target ? target.name : "المستخدم"} أصبح ${roleLabels[selectedRole] || selectedRole}.`
+      );
       setSelectedUser("");
       setSelectedRole("");
       fetchData();
     } catch {
-      /* empty */
+      toastError("تعذر تغيير الدور", "تحقق من الاتصال وحاول مرة أخرى.");
     } finally {
       setUpdating(false);
     }
@@ -169,6 +183,18 @@ export default function AdminRoles() {
                     ))}
                   </SelectContent>
                 </Select>
+                {selectedUser && (
+                  <p className="mt-1.5 text-xs text-gray-muted">
+                    الدور الحالي:{" "}
+                    <span className="font-medium text-white">
+                      {roleLabels[
+                        users.find((u) => u.id === selectedUser)?.role ?? ""
+                      ] ||
+                        users.find((u) => u.id === selectedUser)?.role ||
+                        "—"}
+                    </span>
+                  </p>
+                )}
               </div>
               <div className="flex-1 sm:max-w-xs">
                 <label className="mb-1.5 block text-sm font-medium text-gray-text">الدور الجديد</label>
