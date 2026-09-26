@@ -1,6 +1,6 @@
 "use client";
 
-import { Gem, Rocket, ShieldCheck, Gift, Bot, Sparkles } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getCategoryArt } from "./product-visual-data";
 
@@ -27,10 +27,12 @@ export function ProductVisual({
 
   if (isRealImage) {
     return (
-      <img
+      <Image
         src={imageUrl!}
         alt={alt || productName || ""}
-        className={cn("h-full w-full object-cover", className)}
+        fill
+        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+        className={cn("object-cover", className)}
       />
     );
   }

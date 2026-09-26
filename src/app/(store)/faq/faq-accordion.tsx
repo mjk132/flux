@@ -20,7 +20,7 @@ export default function FAQAccordion({ faqs }: { faqs: FAQ[] }) {
         return (
           <div
             key={faq.id}
-            className="rounded-xl border border-border bg-surface overflow-hidden"
+            className="rounded-2xl border border-border bg-surface overflow-hidden"
           >
             <button
               onClick={() => setOpenId(isOpen ? null : faq.id)}

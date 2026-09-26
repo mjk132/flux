@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select,
@@ -25,26 +24,10 @@ interface Setting {
   value: string;
 }
 
-const generalKeys = [
-  { key: "store_name", label: "اسم المتجر" },
-  { key: "store_description", label: "وصف المتجر" },
-  { key: "hero_title", label: "العنوان الرئيسي" },
-  { key: "hero_subtitle", label: "العنوان الفرعي" },
-];
-
-const socialKeys = [
-  { key: "contact_email", label: "البريد الإلكتروني" },
-  { key: "contact_phone", label: "رقم الهاتف" },
-  { key: "social_discord", label: "رابط Discord" },
-  { key: "social_instagram", label: "رابط Instagram" },
-  { key: "social_facebook", label: "رابط Facebook" },
-  { key: "social_twitter", label: "رابط Twitter" },
-];
-
-const footerKeys = [
-  { key: "footer_text", label: "نص الفوتر" },
-  { key: "footer_links", label: "روابط الفوتر (JSON)" },
-];
+/* Only settings that actually drive the storefront are editable here.
+   The old general/social/footer tabs edited keys (store_name, hero_title,
+   contact_email, social_*, footer_text…) that nothing reads — controls
+   that silently do nothing erode trust in the whole panel. */
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -147,77 +130,14 @@ export default function AdminSettings() {
         </div>
       )}
 
-      <Tabs defaultValue="general">
+      <Tabs defaultValue="payment">
         <TabsList>
-          <TabsTrigger value="general">عام</TabsTrigger>
-          <TabsTrigger value="social">التواصل الاجتماعي</TabsTrigger>
-          <TabsTrigger value="footer">الفوتر</TabsTrigger>
           <TabsTrigger value="payment">
             <CreditCard className="ml-1.5 h-4 w-4" />
             الدفع
           </TabsTrigger>
           <TabsTrigger value="discord">ديسكورد</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="general">
-          <Card className="space-y-4 p-6">
-            {generalKeys.map((item) => (
-              <div key={item.key}>
-                {item.key.includes("description") || item.key.includes("subtitle") ? (
-                  <Textarea
-                    label={item.label}
-                    value={settings[item.key] || ""}
-                    onChange={(e) => updateSetting(item.key, e.target.value)}
-                  />
-                ) : (
-                  <Input
-                    label={item.label}
-                    value={settings[item.key] || ""}
-                    onChange={(e) => updateSetting(item.key, e.target.value)}
-                  />
-                )}
-              </div>
-            ))}
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="social">
-          <Card className="space-y-4 p-6">
-            {socialKeys.map((item) => (
-              <Input
-                key={item.key}
-                label={item.label}
-                value={settings[item.key] || ""}
-                onChange={(e) => updateSetting(item.key, e.target.value)}
-                placeholder={item.label}
-              />
-            ))}
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="footer">
-          <Card className="space-y-4 p-6">
-            {footerKeys.map((item) => (
-              <div key={item.key}>
-                {item.key.includes("links") ? (
-                  <Textarea
-                    label={item.label}
-                    value={settings[item.key] || ""}
-                    onChange={(e) => updateSetting(item.key, e.target.value)}
-                    placeholder='[{"label":"الشروط","url":"/terms"}]'
-                    className="font-mono text-sm"
-                  />
-                ) : (
-                  <Textarea
-                    label={item.label}
-                    value={settings[item.key] || ""}
-                    onChange={(e) => updateSetting(item.key, e.target.value)}
-                  />
-                )}
-              </div>
-            ))}
-          </Card>
-        </TabsContent>
 
         <TabsContent value="payment">
           <Card className="space-y-6 p-6">
@@ -382,6 +302,21 @@ export default function AdminSettings() {
 
         <TabsContent value="discord">
           <Card className="space-y-4 p-6">
+            <div>
+              <Input
+                label="رابط دعوة السيرفر"
+                value={settings["discord_link"] || ""}
+                onChange={(e) =>
+                  updateSetting("discord_link", e.target.value.trim())
+                }
+                placeholder="https://discord.gg/..."
+                dir="ltr"
+                className="text-left"
+              />
+              <p className="mt-1.5 text-xs text-gray-muted">
+                يظهر في الفوتر ودعوة الديسكورد بالصفحة الرئيسية.
+              </p>
+            </div>
             <Input
               label="Discord Server ID"
               value={settings["discord_guild_id"] || ""}

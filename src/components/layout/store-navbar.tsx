@@ -15,7 +15,7 @@ import {
   Heart,
   Home,
   Store,
-  Tags,
+  Wrench,
   User,
   ChevronLeft,
   HelpCircle,
@@ -42,7 +42,7 @@ interface NavCategory {
 const navLinks = [
   { href: "/", label: "الرئيسية", icon: Home },
   { href: "/store", label: "المتجر", icon: Store },
-  { href: "/#offers", label: "العروض", icon: Tags },
+  { href: "/services", label: "الخدمات", icon: Wrench },
   { href: "/faq", label: "الأسئلة الشائعة", icon: HelpCircle },
 ];
 
@@ -129,7 +129,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
     if (href === "/store") return pathname.startsWith("/store") && pathname !== "/";
-    if (href.includes("#")) return pathname === "/" && false;
+    if (href === "/services") return pathname.startsWith("/services");
     return pathname === href;
   }
 
@@ -251,7 +251,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
 
             <Link
               href="/wishlist"
-              className="hidden rounded-lg p-2 text-gray-text transition-colors hover:text-white sm:block"
+              className="relative hidden rounded-lg p-2 text-gray-text transition-colors hover:text-white sm:block"
               aria-label="المفضلة"
             >
               <Heart className="h-[18px] w-[18px]" />
@@ -296,9 +296,11 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
                   >
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-purple-accent to-violet text-[11px] font-bold text-white">
                       {user?.avatar ? (
-                        <img
+                        <Image
                           src={user.avatar}
-                          alt={user.name}
+                          alt={user.name || ""}
+                          width={28}
+                          height={28}
                           className="h-7 w-7 rounded-full object-cover"
                         />
                       ) : (
@@ -387,7 +389,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
               </Link>
             ))}
             <div className="my-2 h-px bg-border" />
-            <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-muted">
+            <p className="px-3 pb-1 text-[11px] font-semibold text-gray-muted">
               الأقسام
             </p>
             {categories.slice(0, 8).map((cat) => (

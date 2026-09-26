@@ -2,38 +2,48 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCartStore } from "@/store/cart";
+import { useCartStore, MAX_QUANTITY_DEFAULT } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, clearCart, getTotal } =
-    useCartStore();
-  const [couponCode, setCouponCode] = useState("");
-  const [couponDiscount, setCouponDiscount] = useState(0);
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    getTotal,
+    couponCode: appliedCouponCode,
+    couponDiscount,
+    applyCoupon,
+    clearCoupon,
+  } = useCartStore();
+  const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
 
   const subtotal = getTotal();
-  const total = subtotal - couponDiscount;
+  const total = Math.max(0, subtotal - couponDiscount);
 
   const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return;
+    const code = couponInput.trim();
+    if (!code) return;
     setCouponLoading(true);
     setCouponError("");
     try {
       const res = await fetch("/api/coupons/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: couponCode.trim(), subtotal }),
+        body: JSON.stringify({ code, subtotal }),
       });
       const data = await res.json();
       if (data.success) {
-        setCouponDiscount(data.data.discount_amount);
+        applyCoupon(code, data.data.discount_amount);
       } else {
         setCouponError(data.error || "كود الخصم غير صالح");
-        setCouponDiscount(0);
+        clearCoupon();
       }
     } catch {
       setCouponError("حدث خطأ، حاول مرة أخرى");
@@ -55,7 +65,7 @@ export default function CartPage() {
         <Link href="/store">
           <Button>
             تصفح المتجر
-            <ArrowRight className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
           </Button>
         </Link>
       </div>
@@ -69,16 +79,22 @@ export default function CartPage() {
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-3">
-          {items.map((item) => (
+          {items.map((item) => {
+            const maxQuantity = item.stock ?? MAX_QUANTITY_DEFAULT;
+            const atMin = item.quantity <= 1;
+            const atMax = item.quantity >= maxQuantity;
+            return (
             <div
               key={item.productId}
-              className="flex gap-4 rounded-xl border border-border bg-surface p-4"
+              className="flex gap-4 rounded-2xl border border-border bg-surface p-4"
             >
               <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-deep-purple">
                 {item.image ? (
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.name}
+                    width={80}
+                    height={80}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -99,23 +115,29 @@ export default function CartPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <button
+                      type="button"
                       onClick={() =>
                         updateQuantity(item.productId, item.quantity - 1)
                       }
-                      className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-gray-text transition-colors hover:bg-surface hover:text-white"
+                      disabled={atMin}
+                      aria-label={`إنقاص الكمية لـ ${item.name}`}
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-gray-text transition-colors hover:bg-surface hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-text"
                     >
-                      <Minus className="h-3 w-3" />
+                      <Minus className="h-4 w-4" />
                     </button>
                     <span className="min-w-[2rem] text-center text-sm font-medium text-white">
                       {item.quantity}
                     </span>
                     <button
+                      type="button"
                       onClick={() =>
                         updateQuantity(item.productId, item.quantity + 1)
                       }
-                      className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-gray-text transition-colors hover:bg-surface hover:text-white"
+                      disabled={atMax}
+                      aria-label={`زيادة الكمية لـ ${item.name}`}
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-gray-text transition-colors hover:bg-surface hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-text"
                     >
-                      <Plus className="h-3 w-3" />
+                      <Plus className="h-4 w-4" />
                     </button>
                   </div>
 
@@ -124,8 +146,10 @@ export default function CartPage() {
                       {formatPrice(item.price * item.quantity)}
                     </span>
                     <button
+                      type="button"
                       onClick={() => removeItem(item.productId)}
-                      className="text-gray-text transition-colors hover:text-danger"
+                      aria-label={`حذف ${item.name} من السلة`}
+                      className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-text transition-colors hover:text-danger"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -133,7 +157,8 @@ export default function CartPage() {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
 
           <button
             onClick={clearCart}
@@ -144,7 +169,7 @@ export default function CartPage() {
         </div>
 
         {/* Order Summary */}
-        <div className="rounded-xl border border-border bg-surface p-6">
+        <div className="rounded-2xl border border-border bg-surface p-6">
           <h2 className="mb-4 text-lg font-semibold text-white">
             ملخص الطلب
           </h2>
@@ -156,7 +181,10 @@ export default function CartPage() {
             </div>
             {couponDiscount > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-success">خصم</span>
+                <span className="text-success">
+                  خصم الكوبون
+                  {appliedCouponCode ? ` (${appliedCouponCode})` : ""}
+                </span>
                 <span className="text-success">
                   -{formatPrice(couponDiscount)}
                 </span>
@@ -176,8 +204,8 @@ export default function CartPage() {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
                 placeholder="أدخل الكود"
                 className="h-10 flex-1 rounded-lg border border-border bg-surface px-3 text-sm text-white placeholder:text-gray-text/60 focus:border-purple-accent focus:outline-none"
               />
@@ -191,7 +219,24 @@ export default function CartPage() {
               </Button>
             </div>
             {couponError && (
-              <p className="mt-1 text-xs text-danger">{couponError}</p>
+              <p role="alert" className="mt-1 text-xs text-danger">
+                {couponError}
+              </p>
+            )}
+            {appliedCouponCode && (
+              <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-sm">
+                <span className="truncate text-success">
+                  تم تطبيق الكوبون: {appliedCouponCode}
+                </span>
+                <button
+                  type="button"
+                  onClick={clearCoupon}
+                  aria-label="إزالة كوبون الخصم"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-text transition-colors hover:text-danger"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             )}
           </div>
 

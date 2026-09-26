@@ -27,11 +27,11 @@ export function LegalPage({
   return (
     <article className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
       <header className="border-b border-border/50 pb-7 pt-10">
-        <p className="mb-2.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-purple-accent">
+        <p className="mb-2.5 flex items-center gap-2 text-[12px] font-bold text-purple-accent">
           <span className="h-px w-6 bg-purple-accent/60" />
           {eyebrow}
         </p>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+        <h1 className="text-3xl font-extrabold text-white sm:text-4xl">
           {title}
         </h1>
         <p className="mt-2.5 text-[13px] text-gray-muted">{updated}</p>
@@ -41,7 +41,7 @@ export function LegalPage({
         {/* Table of contents */}
         <nav aria-label="محتويات الصفحة" className="hidden lg:block">
           <div className="sticky top-[100px] rounded-2xl border border-border bg-surface/60 p-4">
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
+            <p className="mb-3 text-[12px] font-bold text-purple-accent">
               المحتويات
             </p>
             <ul className="space-y-1.5">
@@ -72,7 +72,7 @@ export function LegalPage({
 
           {sections.map((section, i) => (
             <section key={section.id} id={section.id} className="scroll-mt-28">
-              <h2 className="flex items-center gap-3 text-xl font-bold tracking-tight text-white">
+              <h2 className="flex items-center gap-3 text-xl font-bold text-white">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-purple-accent/10 text-[12px] font-bold text-purple-accent ring-1 ring-purple-accent/20">
                   {i + 1}
                 </span>

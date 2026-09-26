@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { CheckCircle, ArrowRight, ShoppingBag } from "lucide-react";
+import { CheckCircle, ArrowLeft, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function SuccessContent() {
@@ -45,7 +45,7 @@ function SuccessContent() {
         <Link href="/store">
           <Button className="w-full sm:w-auto">
             متابعة التسوق
-            <ArrowRight className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
           </Button>
         </Link>
       </div>

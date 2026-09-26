@@ -1,39 +1,38 @@
 import Link from "next/link";
-import { Zap, ShieldCheck, Headphones, Wallet, ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  Wallet,
+  ShieldCheck,
+  Wrench,
+  MessagesSquare,
+} from "lucide-react";
 
-const features = [
+/**
+ * "Why FLUX" — four truthful capabilities, presented as a divided list
+ * (not another grid of identical cards, which every other section uses).
+ * Each line states something the store can actually demonstrate today:
+ * account-based delivery, published pricing, custom development, and
+ * Discord support. No numbers, no guarantees we don't offer.
+ */
+const capabilities = [
   {
-    icon: Zap,
-    title: "تسليم فوري",
-    desc: "المنتجات الرقمية تصل خلال ثوانٍ من تأكيد الطلب — بدون انتظار.",
-    tint: "from-violet/20 to-transparent",
-    iconBg: "bg-violet/15 text-violet ring-violet/25",
-    num: "01",
+    icon: Wallet,
+    title: "ادفع وتعرف السعر قبل الشراء",
+    desc: "الأسعار والخصومات معلنة على كل منتج، والدفع عبر PayPal مع رفع صورة الإيصال في صفحة الطلب.",
   },
   {
     icon: ShieldCheck,
-    title: "منتجات موثوقة",
-    desc: "كل منتج مفحوص ومدعوم بضمان حقيقي. نحمي كل عملية شراء.",
-    tint: "from-sky-500/15 to-transparent",
-    iconBg: "bg-sky-400/15 text-sky-300 ring-sky-400/25",
-    num: "02",
+    title: "التسليم عبر حسابك",
+    desc: "المنتجات الرقمية تظهر في حسابك بعد اعتماد الدفع — لا رسائل خاصة ولا انتظار شحن.",
   },
   {
-    icon: Wallet,
-    title: "أسعار منافسة",
-    desc: "أفضل سعر في السوق مع عروض وخصومات دائمة على المنتجات.",
-    tint: "from-fuchsia-500/15 to-transparent",
-    iconBg: "bg-fuchsia-400/15 text-fuchsia-300 ring-fuchsia-400/25",
-    num: "03",
+    icon: Wrench,
+    title: "تطوير مخصص عند الحاجة",
+    desc: "ديسكورد، FiveM، مواقع، لوحات تحكم وبرمجة مخصصة — اطلب الخدمة وسيتم الاتفاق على التفاصيل قبل البدء.",
   },
   {
-    icon: Headphones,
-    title: "دعم متواصل",
-    desc: "فريق دعم جاهز على مدار الساعة — عبر الديسكورد والبريد.",
-    tint: "from-amber-400/10 to-transparent",
-    iconBg: "bg-amber-400/15 text-amber-300 ring-amber-400/25",
-    num: "04",
+    icon: MessagesSquare,
+    title: "دعم عبر الديسكورد",
+    desc: "للاستفسار قبل الشراء أو للمساعدة بعده، سيرفر الديسكورد هو قناة التواصل المباشر معنا.",
   },
 ];
 
@@ -44,57 +43,38 @@ export function WhyFluxSection() {
         {/* Statement */}
         <div className="relative">
           <div className="sticky top-28">
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
-              لماذا نحن؟
+            <p className="mb-2 text-[12px] font-bold text-purple-accent">
+              لماذا FLUX؟
             </p>
-              <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-4xl">
-                متجرٌ صُنع ليكون{" "}
-                <span className="text-gradient">جديراً بثقتك</span>
-              </h2>
-              <p className="mt-4 max-w-md text-[14px] leading-relaxed text-gray-text">
-                Flux Store ليس مجرد متجر — تجربة تسوق رقمية متكاملة. نختار كل
-                منتج بعناية، ونؤمّن كل عملية شراء، ونبقى بجانبك بعد البيع.
-              </p>
+            <h2 className="text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">
+              متجر منتجات، وورشة تطوير — في مكان واحد
+            </h2>
+            <p className="mt-4 max-w-md text-[14px] leading-relaxed text-gray-text">
+              تختار منتجاً جاهزاً وتشتريه في دقائق، أو تطلب تنفيذاً مخصصاً
+              يبدأ من فكرتك. نفس الفريق، نفس القناة، ونفس الشفافية في السعر.
+            </p>
             <Link
-              href="/faq"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-all hover:border-purple-accent/50 hover:text-white"
+              href="/services"
+              className="mt-6 inline-flex items-center rounded-xl border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-all hover:border-purple-accent/50 hover:text-white"
             >
-              تعرّف علينا أكثر
-              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              تعرّف على الخدمات
             </Link>
           </div>
         </div>
 
-        {/* Features grid */}
-        <div className="grid gap-3 sm:grid-cols-2">
-          {features.map((f) => (
-            <div
-              key={f.num}
-              className="group relative overflow-hidden rounded-2xl border border-border/60 bg-surface p-6 transition-all duration-300 hover:border-purple-accent/40 hover:bg-surface-raised"
-            >
-              <div
-                className={cn(
-                  "pointer-events-none absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100",
-                  f.tint
-                )}
-              />
-              <span className="absolute left-5 top-5 text-3xl font-extrabold text-white/5">
-                {f.num}
-              </span>
-              <div
-                className={cn(
-                  "relative mb-4 flex h-11 w-11 items-center justify-center rounded-xl ring-1",
-                  f.iconBg
-                )}
-              >
+        {/* Capabilities — divided rows, deliberately NOT another card grid */}
+        <div className="divide-y divide-border/60 border-y border-border/60">
+          {capabilities.map((f) => (
+            <div key={f.title} className="flex gap-4 py-6 sm:gap-5 sm:py-7">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-accent/10 text-purple-accent ring-1 ring-purple-accent/20">
                 <f.icon className="h-5 w-5" />
               </div>
-              <h3 className="relative text-[15px] font-bold text-white">
-                {f.title}
-              </h3>
-              <p className="relative mt-1.5 text-[12.5px] leading-relaxed text-gray-text">
-                {f.desc}
-              </p>
+              <div>
+                <h3 className="text-[15px] font-bold text-white">{f.title}</h3>
+                <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-gray-text">
+                  {f.desc}
+                </p>
+              </div>
             </div>
           ))}
         </div>

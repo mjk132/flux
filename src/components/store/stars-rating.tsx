@@ -26,9 +26,9 @@ export function StarsRating({
           className={cn(
             sizeMap[size],
             star <= rating
-              ? "fill-yellow-400 text-yellow-400"
+              ? "fill-amber-400 text-amber-400"
               : "fill-transparent text-gray-text/30",
-            !readonly && "cursor-pointer transition-colors hover:text-yellow-400"
+            !readonly && "cursor-pointer transition-colors hover:text-amber-400"
           )}
         />
       ))}

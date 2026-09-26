@@ -3,16 +3,17 @@ import "./globals.css";
 import { ToastContainer } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
-  title: "Flux Store - متجرك الرقمي الأول",
+  title: "FLUX — منتجات رقمية وتطوير مخصص",
   description:
-    "متجر المنتجات الرقمية المميزة — بوتات ديسكورد، سكربتات FiveM، مواقع وتصاميم. جودة عالية ودعم متواصل.",
+    "بوتات ديسكورد وسكربتات FiveM جاهزة، وتطوير مواقع ولوحات تحكم وبرمجة مخصصة — الدفع عبر PayPal والتسليم عبر حسابك.",
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
   },
   openGraph: {
-    title: "Flux Store",
-    description: "متجرك الرقمي الأول — تسليم فوري وضمان شامل.",
+    title: "FLUX",
+    description:
+      "منتجات رقمية جاهزة وخدمات تطوير مخصصة: ديسكورد، FiveM، مواقع، لوحات تحكم.",
     type: "website",
   },
 };
@@ -45,11 +46,16 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="min-h-full flex flex-col">
+        {/* First focusable element on the page: keyboard users can jump
+            straight past the navigation to the content. */}
+        <a href="#main-content" className="skip-link">
+          تخطَّ إلى المحتوى
+        </a>
         <div className="flex min-h-screen flex-col">{children}</div>
         {/* Mounted once, above every route: the store's add-to-cart
             feedback and the admin panel's save confirmations both render

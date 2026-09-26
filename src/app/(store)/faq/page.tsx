@@ -27,7 +27,7 @@ export default async function FAQPage() {
       </div>
 
       {faqs.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-8 text-center">
+        <div className="rounded-2xl border border-border bg-surface p-8 text-center">
           <p className="text-gray-text">
             لا توجد أسئلة شائعة حالياً
           </p>

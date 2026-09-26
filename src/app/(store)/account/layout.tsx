@@ -8,8 +8,6 @@ import {
   LayoutDashboard,
   Package,
   ShoppingBag,
-  User,
-  Shield,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 
@@ -28,16 +26,6 @@ const sidebarLinks = [
     href: "/account/purchases",
     label: "منتجاتي المشتراة",
     icon: ShoppingBag,
-  },
-  {
-    href: "/account/profile",
-    label: "الملف الشخصي",
-    icon: User,
-  },
-  {
-    href: "/account/security",
-    label: "الأمان",
-    icon: Shield,
   },
 ];
 

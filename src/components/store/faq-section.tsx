@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, MessageCircleQuestion, ArrowLeft } from "lucide-react";
+import { ChevronDown, MessageCircleQuestion } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FAQ } from "@/types";
 
@@ -27,14 +27,6 @@ function FaqItem({ faq, index }: { faq: FAQ; index: number }) {
         className="flex w-full items-center gap-4 px-5 py-4 text-start"
         aria-expanded={open}
       >
-        <span
-          className={cn(
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[12px] font-extrabold transition-colors",
-            open ? "bg-purple-accent text-white" : "bg-deep-purple text-purple-accent"
-          )}
-        >
-          {String(index + 1).padStart(2, "0")}
-        </span>
         <span className="flex-1 text-[14px] font-semibold text-white">
           {faq.question}
         </span>
@@ -52,7 +44,7 @@ function FaqItem({ faq, index }: { faq: FAQ; index: number }) {
         )}
       >
         <div className="overflow-hidden">
-          <p className="px-5 pb-5 pr-16 text-[13px] leading-relaxed text-gray-text">
+          <p className="px-5 pb-5 text-[13px] leading-relaxed text-gray-text">
             {faq.answer}
           </p>
         </div>
@@ -69,23 +61,22 @@ export function FaqSection({ faqs }: FaqSectionProps) {
       <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:gap-14">
         {/* Header side */}
         <div>
-          <p className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
+          <p className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-purple-accent">
             <MessageCircleQuestion className="h-4 w-4" />
             المساعدة
           </p>
-          <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+          <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
             الأسئلة الشائعة
           </h2>
           <p className="mt-3 max-w-sm text-[13.5px] leading-relaxed text-gray-text">
-            إجابات مباشرة على أكثر ما يسأل عنه عملاؤنا. لم تجد سؤالك؟ فريقنا
-            جاهز لمساعدتك في أي وقت.
+            إجابات مباشرة على أكثر ما يسأل عنه العملاء. لم تجد سؤالك؟ اسألنا
+            في سيرفر الديسكورد.
           </p>
           <Link
             href="/faq"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-all hover:border-purple-accent/50 hover:text-white"
+            className="mt-6 inline-flex items-center rounded-xl border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-all hover:border-purple-accent/50 hover:text-white"
           >
             عرض كل الأسئلة
-            <ArrowLeft className="h-3.5 w-3.5" />
           </Link>
         </div>
 

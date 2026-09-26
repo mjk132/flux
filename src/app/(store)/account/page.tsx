@@ -79,7 +79,7 @@ export default function AccountOverviewPage() {
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-20 animate-pulse rounded-xl bg-deep-purple" />
+          <div key={i} className="h-20 animate-pulse rounded-2xl bg-deep-purple" />
         ))}
       </div>
     );
@@ -98,7 +98,7 @@ export default function AccountOverviewPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-border bg-surface p-4">
+        <div className="rounded-2xl border border-border bg-surface p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-accent/10">
               <Package className="h-5 w-5 text-purple-accent" />
@@ -112,7 +112,7 @@ export default function AccountOverviewPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-4">
+        <div className="rounded-2xl border border-border bg-surface p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
               <DollarSign className="h-5 w-5 text-success" />
@@ -126,7 +126,7 @@ export default function AccountOverviewPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-4">
+        <div className="rounded-2xl border border-border bg-surface p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-info/10">
               <Calendar className="h-5 w-5 text-info" />
@@ -147,7 +147,7 @@ export default function AccountOverviewPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Link
           href="/account/orders"
-          className="flex items-center justify-between rounded-xl border border-border bg-surface p-4 transition-colors hover:border-purple-accent/30"
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface p-4 transition-colors hover:border-purple-accent/30"
         >
           <div className="flex items-center gap-3">
             <Package className="h-5 w-5 text-purple-accent" />
@@ -157,7 +157,7 @@ export default function AccountOverviewPage() {
         </Link>
         <Link
           href="/account/purchases"
-          className="flex items-center justify-between rounded-xl border border-border bg-surface p-4 transition-colors hover:border-purple-accent/30"
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface p-4 transition-colors hover:border-purple-accent/30"
         >
           <div className="flex items-center gap-3">
             <ShoppingBag className="h-5 w-5 text-purple-accent" />

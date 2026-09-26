@@ -31,6 +31,13 @@ const hiddenByVariant: Record<RevealVariant, string> = {
  * enter the viewport, then disconnects. Honours the OS "reduce motion"
  * setting automatically (the global reduced-motion rule snaps the
  * transition to its end state).
+ *
+ * SSR-safe by construction: the server HTML renders content VISIBLE
+ * ("static"). Only after hydration does content that starts below the
+ * fold get hidden ("hidden") and then revealed on intersection — so if
+ * JS never runs (or fails), everything stays readable instead of sitting
+ * at opacity-0. Content already in the viewport is never hidden, which
+ * means no flash for the first screen.
  */
 export function Reveal({
   children,
@@ -40,20 +47,29 @@ export function Reveal({
   duration = 700,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [phase, setPhase] = useState<"static" | "hidden" | "shown">("static");
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setVisible(true);
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setPhase("shown");
       return;
     }
+
+    const rect = el.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight - 40 && rect.bottom > 0;
+    if (inView) {
+      // Already on the first screen: never hide it (no flash).
+      setPhase("shown");
+      return;
+    }
+
+    setPhase("hidden");
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setVisible(true);
+            setPhase("shown");
             observer.unobserve(entry.target);
           }
         });
@@ -64,6 +80,8 @@ export function Reveal({
     return () => observer.disconnect();
   }, []);
 
+  const revealed = phase === "static" || phase === "shown";
+
   return (
     <div
       ref={ref}
@@ -73,11 +91,11 @@ export function Reveal({
         // Once revealed, drop the transform entirely so the element
         // stops being a containing block (keeps fixed/sticky inside
         // working) and releases its compositing layer.
-        ...(visible ? { transform: "none" } : null),
+        ...(revealed ? { transform: "none" } : null),
       }}
       className={cn(
         "transition-all ease-[cubic-bezier(0.16,1,0.3,1)]",
-        visible ? "opacity-100" : hiddenByVariant[variant],
+        revealed ? "opacity-100" : hiddenByVariant[variant],
         className
       )}
     >

@@ -1,21 +1,19 @@
 import {
-  Package,
-  LayoutGrid,
-  MessageSquareQuote,
-  Star,
+  CreditCard,
+  PackageCheck,
+  Wrench,
+  MessagesSquare,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { HeroSection } from "@/components/store/hero-section";
 import { CategoryCard } from "@/components/store/category-card";
 import { ProductGrid } from "@/components/store/product-grid";
-import { SpecialOffers } from "@/components/store/special-offers";
 import { WhyFluxSection } from "@/components/store/why-flux-section";
-import { HowItWorksSection } from "@/components/store/how-it-works";
 import { ReviewsSection } from "@/components/store/reviews-section";
 import { FaqSection } from "@/components/store/faq-section";
 import { DiscordCtaSection } from "@/components/store/discord-cta";
-import { Reveal } from "@/components/store/reveal";
+import { ServicesSection } from "@/components/store/services-section";
 import { SectionHeading } from "@/components/store/section-heading";
 import type { ProductCardData } from "@/components/store/product-card";
 
@@ -28,9 +26,9 @@ import type { ProductCardData } from "@/components/store/product-card";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Flux Store - حلول رقمية بهوية مختلفة",
+  title: "FLUX — منتجات رقمية وتطوير مخصص",
   description:
-    "بوتات ديسكورد، سكربتات FiveM، مواقع وتصاميم — جودة عالية، تسليم سريع ودعم متواصل.",
+    "بوتات ديسكورد وسكربتات FiveM جاهزة، وتطوير مواقع ولوحات تحكم وبرمجة مخصصة — الدفع عبر PayPal والتسليم عبر حسابك.",
 };
 
 function toCard(
@@ -73,8 +71,34 @@ function toCard(
   };
 }
 
+/* Capability strip: statements that are true from day one, regardless of
+   how many orders or reviews the store has. Replaces the old stats row
+   that printed "0 تقييم موثق" / "0.0 متوسط التقييم" to every visitor. */
+const capabilities = [
+  {
+    icon: CreditCard,
+    title: "الدفع عبر PayPal",
+    desc: "تحويل مباشر مع رفع صورة الإيصال في صفحة الطلب.",
+  },
+  {
+    icon: PackageCheck,
+    title: "التسليم عبر حسابك",
+    desc: "المنتجات الرقمية تظهر في حسابك بعد اعتماد الدفع.",
+  },
+  {
+    icon: Wrench,
+    title: "تطوير مخصص",
+    desc: "ديسكورد، FiveM، مواقع، لوحات تحكم وبرمجة مخصصة.",
+  },
+  {
+    icon: MessagesSquare,
+    title: "دعم عبر الديسكورد",
+    desc: "للاستفسار والطلب والمساعدة بعد الشراء.",
+  },
+];
+
 export default async function HomePage() {
-  const [categories, stats, bestSellers, offers, featured, reviews, faqs, settings] =
+  const [categories, products, reviews, faqs, settings, ratingAgg] =
     await Promise.all([
       prisma.category.findMany({
         where: { isVisible: true },
@@ -85,41 +109,10 @@ export default async function HomePage() {
           },
         },
       }),
-      Promise.all([
-        prisma.product.count({ where: { status: "PUBLISHED" } }),
-        prisma.category.count({ where: { isVisible: true } }),
-        prisma.review.count({ where: { status: "APPROVED" } }),
-        prisma.review.aggregate({
-          where: { status: "APPROVED" },
-          _avg: { rating: true },
-        }),
-      ]),
       prisma.product.findMany({
-        where: { status: "PUBLISHED", isBestSeller: true },
+        where: { status: "PUBLISHED" },
         take: 8,
-        orderBy: { createdAt: "desc" },
-        include: {
-          images: { take: 1, orderBy: { sortOrder: "asc" } },
-          category: { select: { name: true, nameAr: true, slug: true } },
-          reviews: { where: { status: "APPROVED" }, select: { rating: true } },
-          _count: { select: { orderItems: true } },
-        },
-      }),
-      prisma.product.findMany({
-        where: { status: "PUBLISHED", comparePrice: { not: null } },
-        take: 6,
-        orderBy: { createdAt: "desc" },
-        include: {
-          images: { take: 1, orderBy: { sortOrder: "asc" } },
-          category: { select: { name: true, nameAr: true, slug: true } },
-          reviews: { where: { status: "APPROVED" }, select: { rating: true } },
-          _count: { select: { orderItems: true } },
-        },
-      }),
-      prisma.product.findMany({
-        where: { status: "PUBLISHED", isFeatured: true },
-        take: 8,
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
         include: {
           images: { take: 1, orderBy: { sortOrder: "asc" } },
           category: { select: { name: true, nameAr: true, slug: true } },
@@ -142,152 +135,103 @@ export default async function HomePage() {
         take: 4,
       }),
       prisma.setting.findMany({ where: { key: "discord_link" } }),
+      prisma.review.aggregate({
+        where: { status: "APPROVED" },
+        _avg: { rating: true },
+      }),
     ]);
 
-  const [productCount, categoryCount, reviewCount, ratingAgg] = stats;
   const averageRating = ratingAgg._avg.rating ?? 0;
   const discordUrl =
-    settings.find((s) => s.key === "discord_link")?.value ||
-    "https://discord.gg/fluxstore";
+    settings.find((s) => s.key === "discord_link")?.value || "";
 
-  const statItems = [
-    { icon: Package, value: String(productCount), label: "منتج رقمي" },
-    { icon: LayoutGrid, value: String(categoryCount), label: "قسم متخصص" },
-    { icon: MessageSquareQuote, value: String(reviewCount), label: "تقييم موثق" },
-    {
-      icon: Star,
-      value: averageRating.toFixed(1),
-      label: "متوسط التقييم",
-    },
-  ];
-
-  const categoriesGrid = categories.slice(0, 5);
+  /* Category tiles only for categories that actually hold products, and
+     the section only earns its place once there are two or more — a
+     single "0 منتج" tile is a dead end, not navigation. */
+  const categoriesWithProducts = categories.filter(
+    (c) => c._count.products > 0
+  );
+  const showCategories = categoriesWithProducts.length >= 2;
 
   return (
     <div className="bg-void">
       {/* ═══════════ HERO ═══════════ */}
       <HeroSection />
 
-      {/* ═══════════ REAL STATS ═══════════ */}
+      {/* ═══════════ CAPABILITIES (always true) ═══════════ */}
       <section className="border-b border-border/40 bg-surface/40">
-        <Reveal variant="fade" duration={600}>
-          <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-px px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
-          {statItems.map((s) => (
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-px px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+          {capabilities.map((s) => (
             <div
-              key={s.label}
-              className="flex items-center gap-3 border-b border-border/40 px-2 py-6 lg:border-b-0 lg:px-6 lg:[&:not(:last-child)]:border-l"
+              key={s.title}
+              className="flex items-start gap-3 border-b border-border/40 px-2 py-6 lg:border-b-0 lg:px-6 lg:[&:not(:last-child)]:border-l"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-accent/10 ring-1 ring-purple-accent/20">
                 <s.icon className="h-5 w-5 text-purple-accent" />
               </div>
               <div>
-                <p className="text-xl font-extrabold tracking-tight text-white">
-                  {s.value}
+                <p className="text-[14px] font-bold text-white">{s.title}</p>
+                <p className="mt-0.5 text-[12px] leading-relaxed text-gray-muted">
+                  {s.desc}
                 </p>
-                <p className="text-[11.5px] text-gray-muted">{s.label}</p>
               </div>
             </div>
           ))}
-          </div>
-        </Reveal>
+        </div>
       </section>
 
-      {/* ═══════════ FEATURED CATEGORIES ═══════════ */}
-      {categoriesGrid.length > 0 && (
+      {/* ═══════════ CATEGORIES (only non-empty ones) ═══════════ */}
+      {showCategories && (
         <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
-          <Reveal>
-            <SectionHeading
-              eyebrow="تصفح حسب القسم"
-              title="كل أقسام ديسكورد في مكان واحد"
-              description="اختر القسم الذي يناسب احتياجك وابدأ خلال دقائق — كل المنتجات منظّمة ومرتبة."
-              href="/store"
-              actionLabel="كل الأقسام"
-            />
-          </Reveal>
-          <Reveal delay={80}>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-              {categoriesGrid.map((cat, i) => (
-                <div
-                  key={cat.id}
-                  className={
-                    i === 0
-                      ? "col-span-2 row-span-2 lg:col-span-2 lg:row-span-2"
-                      : "col-span-1"
-                  }
-                >
-                  <CategoryCard
-                    category={cat}
-                    size={i === 0 ? "lg" : "sm"}
-                    className="h-full"
-                  />
-                </div>
-              ))}
-            </div>
-          </Reveal>
+          <SectionHeading
+            eyebrow="تصفح حسب القسم"
+            title="الأقسام"
+            description="اختر القسم الذي يناسب احتياجك — كل المنتجات منظّمة بداخله."
+            href="/store"
+            actionLabel="كل الأقسام"
+          />
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {categoriesWithProducts.map((cat) => (
+              <CategoryCard
+                key={cat.id}
+                category={cat}
+                className="h-full"
+              />
+            ))}
+          </div>
         </section>
       )}
 
-      {/* ═══════════ BEST SELLERS ═══════════ */}
-      {bestSellers.length > 0 && (
+      {/* ═══════════ PRODUCTS ═══════════ */}
+      {products.length > 0 && (
         <section className="border-y border-border/40 bg-surface/30">
           <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
-            <Reveal>
-              <SectionHeading
-                eyebrow="اختيارات مضمونة"
-                title="الأكثر مبيعاً"
-                description="منتجات نالت ثقة عملائنا فعلياً وتُكرَّر طلباتها يومياً."
-                href="/store?sort=best-selling"
-              />
-            </Reveal>
-            <ProductGrid products={bestSellers.map(toCard)} />
+            <SectionHeading
+              eyebrow="المتجر"
+              title="منتجات متاحة الآن"
+              description="منتجات رقمية جاهزة للشراء — السعر والخصم معلنان قبل الطلب."
+              href="/store"
+              actionLabel="كل المنتجات"
+            />
+            <ProductGrid products={products.map(toCard)} />
           </div>
         </section>
       )}
 
-      {/* ═══════════ SPECIAL OFFERS ═══════════ */}
-      <SpecialOffers offers={offers.map(toCard)} />
-
-      {/* ═══════════ FEATURED PRODUCTS ═══════════ */}
-      {featured.length > 0 && (
-        <section className="border-t border-border/40">
-          <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
-            <Reveal>
-              <SectionHeading
-                eyebrow="مختارات المحررين"
-                title="منتجات مميزة"
-                description="أفضل ما نقدمه هذا الموسم، مختار بعناية لجودته وقيمته."
-                href="/store"
-              />
-            </Reveal>
-            <ProductGrid products={featured.map(toCard)} />
-          </div>
-        </section>
-      )}
+      {/* ═══════════ SERVICES ═══════════ */}
+      <ServicesSection />
 
       {/* ═══════════ WHY FLUX ═══════════ */}
-      <Reveal duration={800}>
-        <WhyFluxSection />
-      </Reveal>
+      <WhyFluxSection />
 
-      {/* ═══════════ HOW IT WORKS ═══════════ */}
-      <Reveal duration={800}>
-        <HowItWorksSection />
-      </Reveal>
-
-      {/* ═══════════ REVIEWS ═══════════ */}
-      <Reveal duration={800}>
-        <ReviewsSection reviews={reviews} averageRating={averageRating} />
-      </Reveal>
+      {/* ═══════════ REVIEWS (renders only with real approved reviews) */}
+      <ReviewsSection reviews={reviews} averageRating={averageRating} />
 
       {/* ═══════════ FAQ ═══════════ */}
-      <Reveal duration={800}>
-        <FaqSection faqs={faqs} />
-      </Reveal>
+      <FaqSection faqs={faqs} />
 
-      {/* ═══════════ DISCORD CTA ═══════════ */}
-      <Reveal duration={800}>
-        <DiscordCtaSection discordUrl={discordUrl} />
-      </Reveal>
+      {/* ═══════════ FINAL CTA ═══════════ */}
+      <DiscordCtaSection discordUrl={discordUrl} />
     </div>
   );
 }

@@ -50,7 +50,7 @@ const colors = {
 const MAX_VISIBLE = 3;
 
 let queue: Toast[] = [];
-let listeners = new Set<() => void>();
+const listeners = new Set<() => void>();
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function emit() {

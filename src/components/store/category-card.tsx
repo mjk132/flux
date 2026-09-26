@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCategoryArt } from "./product-visual-data";
 import type { CategoryWithProducts } from "@/types";
@@ -69,7 +68,7 @@ export function CategoryCard({
       <div className="relative mt-auto p-5">
         <p
           className={cn(
-            "text-[11px] font-semibold uppercase tracking-wider opacity-70",
+            "text-[11px] font-semibold opacity-70",
             art.accent
           )}
         >
@@ -88,16 +87,6 @@ export function CategoryCard({
             {category.description}
           </p>
         )}
-
-        <div
-          className={cn(
-            "mt-3 flex items-center gap-1 text-[12px] font-semibold text-white/0 transition-all duration-300 group-hover:text-white",
-            art.accent && "group-hover:text-white"
-          )}
-        >
-          <span className={cn("transition-colors", art.accent)}>تصفح القسم</span>
-          <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
-        </div>
       </div>
     </Link>
   );

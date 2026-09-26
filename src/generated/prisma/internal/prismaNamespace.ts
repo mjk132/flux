@@ -415,6 +415,7 @@ export const ModelName = {
   FAQ: 'FAQ',
   Setting: 'Setting',
   Session: 'Session',
+  ServiceRequest: 'ServiceRequest',
   AuditLog: 'AuditLog'
 } as const
 
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "category" | "product" | "productImage" | "inventory" | "order" | "orderItem" | "payment" | "coupon" | "couponUsage" | "couponProduct" | "review" | "wishlist" | "notification" | "banner" | "fAQ" | "setting" | "session" | "auditLog"
+    modelProps: "user" | "category" | "product" | "productImage" | "inventory" | "order" | "orderItem" | "payment" | "coupon" | "couponUsage" | "couponProduct" | "review" | "wishlist" | "notification" | "banner" | "fAQ" | "setting" | "session" | "serviceRequest" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1767,6 +1768,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ServiceRequest: {
+      payload: Prisma.$ServiceRequestPayload<ExtArgs>
+      fields: Prisma.ServiceRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ServiceRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ServiceRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.ServiceRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ServiceRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>
+        }
+        findMany: {
+          args: Prisma.ServiceRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>[]
+        }
+        create: {
+          args: Prisma.ServiceRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>
+        }
+        createMany: {
+          args: Prisma.ServiceRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ServiceRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.ServiceRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>
+        }
+        update: {
+          args: Prisma.ServiceRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.ServiceRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ServiceRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ServiceRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.ServiceRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ServiceRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.ServiceRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateServiceRequest>
+        }
+        groupBy: {
+          args: Prisma.ServiceRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ServiceRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ServiceRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ServiceRequestCountAggregateOutputType> | number
+        }
+      }
+    }
     AuditLog: {
       payload: Prisma.$AuditLogPayload<ExtArgs>
       fields: Prisma.AuditLogFieldRefs
@@ -2145,6 +2220,20 @@ export const SessionScalarFieldEnum = {
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
+export const ServiceRequestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  contact: 'contact',
+  serviceType: 'serviceType',
+  description: 'description',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ServiceRequestScalarFieldEnum = (typeof ServiceRequestScalarFieldEnum)[keyof typeof ServiceRequestScalarFieldEnum]
+
+
 export const AuditLogScalarFieldEnum = {
   id: 'id',
   action: 'action',
@@ -2384,6 +2473,7 @@ export type GlobalOmitConfig = {
   fAQ?: Prisma.FAQOmit
   setting?: Prisma.SettingOmit
   session?: Prisma.SessionOmit
+  serviceRequest?: Prisma.ServiceRequestOmit
   auditLog?: Prisma.AuditLogOmit
 }
 

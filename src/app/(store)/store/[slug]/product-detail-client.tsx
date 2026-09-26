@@ -36,6 +36,7 @@ export default function ProductDetailClient({ product }: { product: ProductInfo 
       name,
       price: finalPrice,
       image: product.image,
+      stock: product.stock,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -51,6 +52,7 @@ export default function ProductDetailClient({ product }: { product: ProductInfo 
       name: product.nameAr || product.name,
       price: finalPrice,
       image: product.image,
+      stock: product.stock,
     });
     router.push("/checkout");
   };

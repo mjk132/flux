@@ -35,7 +35,10 @@ export function slugify(text: string): string {
 
 export function formatDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString("en-US", {
+  /* Arabic month names with Latin digits (ar-u-nu-latn) — the site is
+     Arabic-first; "en-US" dates were leaking English into order history,
+     reviews and admin tables. */
+  return d.toLocaleDateString("ar-u-nu-latn", {
     year: "numeric",
     month: "long",
     day: "numeric",

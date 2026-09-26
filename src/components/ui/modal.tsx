@@ -27,14 +27,22 @@ const ModalOverlay = forwardRef<
 ));
 ModalOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+type ModalContentProps = React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Content
+> & {
+  /** اسم بديل للنافذة يُستخدم في aria-label (الافتراضي: "نافذة") */
+  ariaLabel?: string;
+};
+
 const ModalContent = forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  ModalContentProps
+>(({ className, children, ariaLabel, ...props }, ref) => (
   <ModalPortal>
     <ModalOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      aria-label={ariaLabel ?? "نافذة"}
       className={cn(
         "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2",
         "rounded-xl border border-border bg-surface p-6 shadow-2xl",

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Heart, Trash2, Package } from "lucide-react";
 import { useWishlistStore } from "@/store/wishlist";
 import { useCartStore } from "@/store/cart";
@@ -17,6 +18,7 @@ interface Product {
   price: number;
   comparePrice?: number | null;
   discount: number;
+  stock: number;
   images: { url: string }[];
   category: { name: string };
 }
@@ -66,6 +68,7 @@ export default function WishlistPage() {
       name,
       price,
       image: product.images[0]?.url || "",
+      stock: product.stock,
     });
     success("أُضيفت إلى السلة", `${name} — ${formatPrice(price)}`, {
       label: "عرض السلة",
@@ -81,14 +84,14 @@ export default function WishlistPage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="mb-3 aspect-square rounded-xl bg-deep-purple" />
+              <div className="mb-3 aspect-square rounded-2xl bg-deep-purple" />
               <div className="mb-2 h-4 w-3/4 rounded bg-deep-purple" />
               <div className="h-3 w-1/2 rounded bg-deep-purple" />
             </div>
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface py-16 text-center">
+        <div className="rounded-2xl border border-border bg-surface py-16 text-center">
           <Heart className="mx-auto mb-4 h-12 w-12 text-gray-text" />
           <p className="mb-2 text-lg font-medium text-white">
             قائمة الأمنيات فارغة
@@ -111,15 +114,17 @@ export default function WishlistPage() {
             return (
               <div
                 key={product.id}
-                className="group overflow-hidden rounded-xl border border-border bg-surface"
+                className="group overflow-hidden rounded-2xl border border-border bg-surface"
               >
                 <Link href={`/store/${product.slug}`} className="block">
                   <div className="relative aspect-square bg-deep-purple overflow-hidden">
                     {product.images[0] ? (
-                      <img
+                      <Image
                         src={product.images[0].url}
                         alt={product.name}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 640px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center text-gray-text">

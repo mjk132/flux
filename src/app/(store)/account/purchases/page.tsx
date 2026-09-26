@@ -65,11 +65,11 @@ export default function PurchasesPage() {
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-xl bg-deep-purple" />
+            <div key={i} className="h-20 animate-pulse rounded-2xl bg-deep-purple" />
           ))}
         </div>
       ) : purchases.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-8 text-center">
+        <div className="rounded-2xl border border-border bg-surface p-8 text-center">
           <Package className="mx-auto mb-3 h-12 w-12 text-gray-text" />
           <p className="text-gray-text">لم تقم بشراء أي منتجات رقمية بعد</p>
         </div>
@@ -78,7 +78,7 @@ export default function PurchasesPage() {
           {purchases.map((purchase) => (
             <div
               key={purchase.id}
-              className="rounded-xl border border-border bg-surface p-4"
+              className="rounded-2xl border border-border bg-surface p-4"
             >
               <div className="flex items-center justify-between">
                 <div>

@@ -52,10 +52,10 @@ export function ReviewsSection({ reviews, averageRating }: ReviewsSectionProps) 
     <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
+          <p className="mb-2 text-[12px] font-bold text-purple-accent">
             آراء حقيقية
           </p>
-          <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+          <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
             ماذا يقول عملاؤنا
           </h2>
         </div>
@@ -73,16 +73,14 @@ export function ReviewsSection({ reviews, averageRating }: ReviewsSectionProps) 
         <article className="relative overflow-hidden rounded-2xl border border-purple-accent/30 bg-gradient-to-br from-purple-accent/15 via-surface to-surface p-7 lg:row-span-2">
           <Quote className="absolute left-6 top-6 h-14 w-14 text-purple-accent/15" />
           <div className="relative">
-            <span className="inline-flex rounded-full bg-purple-accent/15 px-2.5 py-0.5 text-[10.5px] font-bold text-purple-accent">
-              الأكثر تفضيلاً
-            </span>
-            <div className="mt-4">
+            <div className="mt-1">
               <Stars rating={featured.rating} />
             </div>
-            <p className="mt-4 text-[15px] font-medium leading-relaxed text-white">
-              {featured.comment ||
-                "تجربة ممتازة — تسليم فوري وتعامل راقٍ من فريق Flux."}
-            </p>
+            {featured.comment && (
+              <p className="mt-4 text-[15px] font-medium leading-relaxed text-white">
+                {featured.comment}
+              </p>
+            )}
             <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
               <Avatar name={featured.user.name} />
               <div>
@@ -90,8 +88,9 @@ export function ReviewsSection({ reviews, averageRating }: ReviewsSectionProps) 
                   {featured.user.name}
                 </p>
                 <p className="text-[11.5px] text-gray-muted">
-                  اشترى:{" "}
-                  {featured.product.nameAr || featured.product.name} •{" "}
+                  اشترى: {featured.product.nameAr || featured.product.name}
+                </p>
+                <p className="text-[11.5px] text-gray-muted">
                   {formatDate(featured.createdAt)}
                 </p>
               </div>
@@ -111,9 +110,11 @@ export function ReviewsSection({ reviews, averageRating }: ReviewsSectionProps) 
                 {formatDate(review.createdAt)}
               </span>
             </div>
-            <p className="mt-3 line-clamp-3 flex-1 text-[13px] leading-relaxed text-gray-text">
-              {review.comment || "توصية واضحة — منتج ممتاز وسريع التسليم."}
-            </p>
+            {review.comment && (
+              <p className="mt-3 line-clamp-3 flex-1 text-[13px] leading-relaxed text-gray-text">
+                {review.comment}
+              </p>
+            )}
             <div className="mt-5 flex items-center gap-2.5 border-t border-border/60 pt-4">
               <Avatar name={review.user.name} />
               <div className="min-w-0">

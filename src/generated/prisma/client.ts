@@ -132,6 +132,11 @@ export type Setting = Prisma.SettingModel
  */
 export type Session = Prisma.SessionModel
 /**
+ * Model ServiceRequest
+ * 
+ */
+export type ServiceRequest = Prisma.ServiceRequestModel
+/**
  * Model AuditLog
  * 
  */

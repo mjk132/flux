@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SERVICE_SLUGS } from "@/config/services";
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
 
@@ -110,29 +111,32 @@ export const orderCreateSchema = z.object({
 
 // ─── Coupon ─────────────────────────────────────────────────────────────────
 
-export const couponCreateSchema = z
-  .object({
-    code: z.string().min(3, "Code must be at least 3 characters"),
-    description: z.string().optional().nullable(),
-    discount_type: z.enum(["PERCENTAGE", "FIXED"]),
-    discount_value: z.number().positive("Discount must be positive"),
-    minimum_order: z.number().positive().optional().nullable(),
-    maximum_discount: z.number().positive().optional().nullable(),
-    usage_limit: z.number().int().positive().optional().nullable(),
-    is_active: z.boolean().default(true),
-    starts_at: z.string().datetime().optional().nullable(),
-    expires_at: z.string().datetime().optional().nullable(),
-  })
-  .refine(
-    (data) => {
-      if (data.discount_type === "PERCENTAGE" && data.discount_value > 100)
-        return false;
-      return true;
-    },
-    { message: "Percentage discount cannot exceed 100", path: ["discount_value"] }
-  );
+// Base shape kept separate from the refinement so `partial()` (used by the
+// update schema below) stays available — zod refuses to call `.partial()` on
+// a refined schema, which crashed this module at import time.
+const couponCreateObject = z.object({
+  code: z.string().min(3, "Code must be at least 3 characters"),
+  description: z.string().optional().nullable(),
+  discount_type: z.enum(["PERCENTAGE", "FIXED"]),
+  discount_value: z.number().positive("Discount must be positive"),
+  minimum_order: z.number().positive().optional().nullable(),
+  maximum_discount: z.number().positive().optional().nullable(),
+  usage_limit: z.number().int().positive().optional().nullable(),
+  is_active: z.boolean().default(true),
+  starts_at: z.string().datetime().optional().nullable(),
+  expires_at: z.string().datetime().optional().nullable(),
+});
 
-export const couponUpdateSchema = couponCreateSchema.partial().extend({
+export const couponCreateSchema = couponCreateObject.refine(
+  (data) => {
+    if (data.discount_type === "PERCENTAGE" && data.discount_value > 100)
+      return false;
+    return true;
+  },
+  { message: "Percentage discount cannot exceed 100", path: ["discount_value"] }
+);
+
+export const couponUpdateSchema = couponCreateObject.partial().extend({
   id: z.string().uuid(),
 });
 
@@ -181,6 +185,30 @@ export const faqUpdateSchema = faqCreateSchema.partial().extend({
   id: z.string().uuid(),
 });
 
+// ─── Service Request ────────────────────────────────────────────────────────
+
+/** Email address OR a Discord-style handle (letters, numbers, dots, underscores). */
+const contactRegex = /^(@?[\w.]{2,32}|[^@\s]+@[^@\s]+\.[^@\s]+)$/;
+
+export const serviceRequestCreateSchema = z.object({
+  name: z.string().trim().min(2, "الاسم قصير جداً"),
+  contact: z
+    .string()
+    .trim()
+    .min(3, "وسيلة التواصل قصيرة جداً")
+    .regex(contactRegex, "أدخل بريداً إلكترونياً أو اسم مستخدم ديسكورد"),
+  serviceType: z.enum(SERVICE_SLUGS, "اختر نوع الخدمة"),
+  description: z
+    .string()
+    .trim()
+    .min(20, "الوصف يجب أن يكون 20 حرفاً على الأقل")
+    .max(2000, "الوصف طويل جداً (الحد الأقصى 2000 حرف)"),
+});
+
+export const serviceRequestStatusSchema = z.object({
+  status: z.enum(["NEW", "CONTACTED", "CLOSED"], "حالة غير صالحة"),
+});
+
 // ─── Settings ───────────────────────────────────────────────────────────────
 
 export const settingsUpdateSchema = z.object({
@@ -221,4 +249,6 @@ export type BannerCreateInput = z.infer<typeof bannerCreateSchema>;
 export type BannerUpdateInput = z.infer<typeof bannerUpdateSchema>;
 export type FAQCreateInput = z.infer<typeof faqCreateSchema>;
 export type FAQUpdateInput = z.infer<typeof faqUpdateSchema>;
+export type ServiceRequestCreateInput = z.infer<typeof serviceRequestCreateSchema>;
+export type ServiceRequestStatusInput = z.infer<typeof serviceRequestStatusSchema>;
 export type SettingsUpdateInput = z.infer<typeof settingsUpdateSchema>;

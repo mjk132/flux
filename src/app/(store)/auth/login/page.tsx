@@ -39,7 +39,7 @@ function LoginContent() {
               className="object-cover"
             />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">
+          <h1 className="text-2xl font-extrabold text-white">
             تسجيل الدخول عبر ديسكورد
           </h1>
           <p className="mt-2 text-sm text-gray-text">

@@ -69,6 +69,7 @@ export const ModelName = {
   FAQ: 'FAQ',
   Setting: 'Setting',
   Session: 'Session',
+  ServiceRequest: 'ServiceRequest',
   AuditLog: 'AuditLog'
 } as const
 
@@ -351,6 +352,20 @@ export const SessionScalarFieldEnum = {
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const ServiceRequestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  contact: 'contact',
+  serviceType: 'serviceType',
+  description: 'description',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ServiceRequestScalarFieldEnum = (typeof ServiceRequestScalarFieldEnum)[keyof typeof ServiceRequestScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {

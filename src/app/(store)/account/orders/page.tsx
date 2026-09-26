@@ -69,11 +69,11 @@ export default function OrdersPage() {
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-deep-purple" />
+            <div key={i} className="h-16 animate-pulse rounded-2xl bg-deep-purple" />
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-8 text-center">
+        <div className="rounded-2xl border border-border bg-surface p-8 text-center">
           <p className="mb-4 text-gray-text">لا توجد طلبات بعد</p>
           <Link
             href="/store"
@@ -84,7 +84,7 @@ export default function OrdersPage() {
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-xl border border-border">
+          <div className="overflow-x-auto rounded-2xl border border-border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-surface">

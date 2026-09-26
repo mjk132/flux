@@ -69,14 +69,14 @@ export default function OrderDetailPage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded-lg bg-deep-purple" />
-        <div className="h-64 animate-pulse rounded-xl bg-deep-purple" />
+        <div className="h-64 animate-pulse rounded-2xl bg-deep-purple" />
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div className="rounded-xl border border-border bg-surface p-8 text-center">
+      <div className="rounded-2xl border border-border bg-surface p-8 text-center">
         <p className="text-gray-text">الطلب غير موجود</p>
       </div>
     );
@@ -109,7 +109,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Status */}
-      <div className="rounded-xl border border-border bg-surface p-4">
+      <div className="rounded-2xl border border-border bg-surface p-4">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-sm text-gray-text">الحالة:</span>
           <Badge variant={status.variant}>{status.label}</Badge>
@@ -151,7 +151,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Order Items */}
-      <div className="rounded-xl border border-border bg-surface p-4">
+      <div className="rounded-2xl border border-border bg-surface p-4">
         <h2 className="mb-4 text-lg font-semibold text-white">المنتجات</h2>
         <div className="space-y-3">
           {order.items.map((item) => (
@@ -197,7 +197,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Delivery Info */}
-      <div className="rounded-xl border border-border bg-surface p-4">
+      <div className="rounded-2xl border border-border bg-surface p-4">
         <h2 className="mb-3 text-lg font-semibold text-white">
           معلومات التسليم
         </h2>

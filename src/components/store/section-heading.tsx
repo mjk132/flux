@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SectionHeadingProps {
-  /** Small accent label above the title */
+  /** Small accent label above the title (kept sentence-case: letter-spacing
+      is harmful on Arabic, so no uppercase/tracking here) */
   eyebrow: string;
   title: string;
   /** Optional supporting line — keeps the editorial rhythm consistent */
   description?: string;
-  /** Renders the "show all" link on the left when provided */
+  /** Renders the "show all" action on the leading side when provided */
   href?: string;
   actionLabel?: string;
   className?: string;
@@ -35,11 +35,11 @@ export function SectionHeading({
       )}
     >
       <div className="max-w-2xl">
-        <p className="mb-2.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-purple-accent">
+        <p className="mb-2.5 flex items-center gap-2 text-[12px] font-bold text-purple-accent">
           <span className="h-px w-6 bg-purple-accent/60" />
           {eyebrow}
         </p>
-        <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+        <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
           {title}
         </h2>
         {description && (
@@ -52,10 +52,9 @@ export function SectionHeading({
       {href && (
         <Link
           href={href}
-          className="group inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-[13px] font-semibold text-purple-accent transition-all duration-300 hover:border-purple-accent/40 hover:bg-purple-accent/5 hover:text-violet"
+          className="inline-flex items-center rounded-full border border-border px-3.5 py-2 text-[13px] font-semibold text-purple-accent transition-all duration-300 hover:border-purple-accent/40 hover:bg-purple-accent/5 hover:text-violet"
         >
           {actionLabel}
-          <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
         </Link>
       )}
     </div>

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import "dotenv/config";
-import { PrismaClient } from "../src/generated/prisma";
+import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import bcrypt from "bcryptjs";
 
@@ -174,7 +174,7 @@ async function main() {
         "حساب بوت ديسكورد",
         "صلاحيات إدارية"
       ]),
-      deliveryInfo: "تسليم فوري مع دليل التثبيت",
+      deliveryInfo: "تسليم رقمي عبر حسابك بعد اعتماد الدفع — مع دليل التثبيت",
       warranty: "ضمان 14 يوم",
       tags: JSON.stringify(["discord", "bot", "moderation", "أتمتة"]),
       categoryId: categories["discord-bots"].id,
@@ -235,7 +235,7 @@ async function main() {
       requirements: JSON.stringify([
         "سيرفر FiveM يعمل بإطار ESX"
       ]),
-      deliveryInfo: "تسليم فوري",
+      deliveryInfo: "تسليم رقمي عبر حسابك بعد اعتماد الدفع",
       warranty: "ضمان 14 يوم",
       tags: JSON.stringify(["fivem", "scripts", "esx", "سكربتات"]),
       categoryId: categories["fivem"].id,
@@ -469,7 +469,7 @@ async function main() {
         "ملفات بجودة عالية"
       ]),
       requirements: JSON.stringify([]),
-      deliveryInfo: "تسليم فوري",
+      deliveryInfo: "تسليم رقمي عبر حسابك بعد اعتماد الدفع",
       warranty: "ضمان الجودة",
       tags: JSON.stringify(["design", "server", "pack", "تصميم"]),
       categoryId: categories["design"].id,
@@ -547,14 +547,10 @@ async function main() {
   console.log("Inventory codes created\n");
 
     // ==================== REVIEWS ====================
-  console.log("Creating reviews...");
-  await prisma.review.create({ data: { userId: customer1.id, productId: products["custom-discord-bot"].id, rating: 5, comment: "بوت ممتاز وتعامل راقٍ. التسليم كان أسرع من المتوقع!", status: "APPROVED" } });
-  await prisma.review.create({ data: { userId: customer2.id, productId: products["fivem-esx-script-pack"].id, rating: 5, comment: "سكربتات نظيفة وشغالة بدون مشاكل. أنصح فيه.", status: "APPROVED" } });
-  await prisma.review.create({ data: { userId: customer3.id, productId: products["business-website"].id, rating: 5, comment: "موقع احترافي وتسليم سريع. شغل يستاهل السعر.", status: "APPROVED" } });
-  await prisma.review.create({ data: { userId: customer1.id, productId: products["server-design-pack"].id, rating: 4, comment: "تصاميم جميلة وسعر مناسب.", status: "APPROVED" } });
-  await prisma.review.create({ data: { userId: customer2.id, productId: products["bugfix-optimization"].id, rating: 5, comment: "حل مشكلتي في نفس اليوم. شكراً!", status: "APPROVED" } });
-  await prisma.review.create({ data: { userId: customer3.id, productId: products["custom-fivem-script"].id, rating: 5, comment: "سكربت مخصص حسب طلبي بالضبط. جودة عالية.", status: "APPROVED" } });
-  console.log("Reviews created\n");
+  // No reviews are seeded, ever. Reviews are trust signals: they must only
+  // come from real verified purchases, so a fresh install shows the honest
+  // empty state instead of manufactured praise (the old seed created six
+  // fake 5-star reviews from invented customers).
 
   // ==================== COUPONS ====================
   console.log("Creating coupons...");
@@ -588,7 +584,7 @@ async function main() {
   await prisma.setting.create({ data: { key: "store_tagline", value: "منتجات رقمية بهوية مختلفة", type: "text" } });
   await prisma.setting.create({ data: { key: "hero_title", value: "منتجات رقمية بهوية مختلفة", type: "text" } });
   await prisma.setting.create({ data: { key: "hero_description", value: "بوتات ديسكورد، سكربتات FiveM، مواقع وتصاميم — تسليم سريع وجودة عالية ودعم متواصل", type: "text" } });
-  await prisma.setting.create({ data: { key: "discord_link", value: "https://discord.gg/https://discord.gg/xRQGGKfZzN", type: "url" } });
+  await prisma.setting.create({ data: { key: "discord_link", value: "https://discord.gg/xRQGGKfZzN", type: "url" } });
   await prisma.setting.create({ data: { key: "discord_guild_id", value: "", type: "text" } });
   await prisma.setting.create({ data: { key: "paypal_email", value: "", type: "text" } });
   await prisma.setting.create({ data: { key: "paypal_qr_image", value: "", type: "url" } });
@@ -597,10 +593,10 @@ async function main() {
 
     // ==================== FAQS ====================
   console.log("Creating FAQs...");
-  await prisma.fAQ.create({ data: { question: "كيف أستلم المنتج بعد الشراء؟", answer: "المنتجات الجاهزة (بوتات، سكربتات، حزم تصميم) تُسلَّم فوراً بعد الدفع. أما الخدمات المخصصة فيتواصل معك فريقنا عبر الديسكورد لبدء التنفيذ.", sortOrder: 1 } });
-  await prisma.fAQ.create({ data: { question: "كيف أطلب خدمة مخصصة؟", answer: "اختر الخدمة وأتمم الطلب، ثم تواصل معنا عبر الديسكورد واذكر رقم الطلب مع تفاصيل ما تريده وسيبدأ فريقنا العمل فوراً.", sortOrder: 2 } });
-  await prisma.fAQ.create({ data: { question: "ما هي طرق الدفع المتاحة؟", answer: "نقبل جميع بطاقات الائتمان (Visa, MasterCard)، Apple Pay، STC Pay، والتحويل البنكي.", sortOrder: 3 } });
-  await prisma.fAQ.create({ data: { question: "ماذا لو واجهت مشكلة في المنتج؟", answer: "تواصل معنا عبر الديسكورد أو البريد الإلكتروني وسنقوم بحل المشكلة في أقرب وقت ممكن. نوفر دعم فني على مدار الساعة.", sortOrder: 4 } });
+  await prisma.fAQ.create({ data: { question: "كيف أستلم المنتج بعد الشراء؟", answer: "المنتجات الجاهزة (بوتات، سكربتات، حزم تصميم) تظهر في حسابك بعد اعتماد الدفع — ترفع صورة إيصال PayPal في صفحة الطلب وتتم مراجعته من فريقنا. أما الخدمات المخصصة فنتواصل معك عبر الديسكورد لبدء الاتفاق على التفاصيل.", sortOrder: 1 } });
+  await prisma.fAQ.create({ data: { question: "كيف أطلب خدمة مخصصة؟", answer: "اختر الخدمة من صفحة الخدمات واملأ نموذج طلب الخدمة بتفاصيل ما تحتاجه — نراجع طلبك ونتواصل معك عبر الديسكورد لتأكيد السعر والمدة قبل بدء التنفيذ.", sortOrder: 2 } });
+  await prisma.fAQ.create({ data: { question: "ما هي طرق الدفع المتاحة؟", answer: "الدفع عبر PayPal: تنقل المبلغ إلى حسابنا وترفع صورة الإيصال في صفحة الطلب، وبعد مراجعته يُؤكد الطلب ويبدأ التسليم عبر حسابك.", sortOrder: 3 } });
+  await prisma.fAQ.create({ data: { question: "ماذا لو واجهت مشكلة في المنتج؟", answer: "تواصل معنا عبر سيرفر الديسكورد مع رقم الطلب ووصف المشكلة، وسنراجعها معك في أقرب وقت ممكن.", sortOrder: 4 } });
   await prisma.fAQ.create({ data: { question: "هل يمكنني استرداد المبلغ؟", answer: "نعم، يمكنك استرداد المبلغ إذا لم يتم تسليم المنتج الجاهز، أو إذا لم يبدأ العمل في الخدمة المخصصة بعد.", sortOrder: 5 } });
   console.log("FAQs created\n");
 
@@ -632,7 +628,7 @@ async function main() {
   console.log("Users: 4");
   console.log("Categories: 5");
   console.log("Products: 13");
-  console.log("Reviews: 6");
+  console.log("Reviews: 0 (intentionally — reviews come only from real purchases)");
   console.log("Coupons: 2");
   console.log("Settings: 9");
   console.log("FAQs: 5");
