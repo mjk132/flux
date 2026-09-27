@@ -23,7 +23,13 @@ export default function ServicesPage() {
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-8">
       <header className="max-w-2xl">
-        <h1 className="text-3xl font-extrabold text-white">الخدمات</h1>
+        <p className="mb-2.5 flex items-center gap-2 text-[12px] font-bold text-purple-accent">
+          <span className="h-px w-6 bg-purple-accent/60" />
+          تطوير مخصص
+        </p>
+        <h1 className="text-3xl font-extrabold text-white sm:text-4xl">
+          الخدمات
+        </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-gray-text">
           في FLUX ننفّذ أعمال التطوير المخصصة: من البوتات والسكربتات إلى المواقع
           ولوحات التحكم. اختر الخدمة التي تناسبك وصف احتياجك، وسيتواصل معك فريقنا
@@ -37,7 +43,8 @@ export default function ServicesPage() {
           return (
             <li
               key={service.slug}
-              className="flex flex-col rounded-2xl border border-border bg-surface p-5"
+              id={service.slug}
+              className="flex scroll-mt-28 flex-col rounded-2xl border border-border bg-surface p-5"
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-purple-accent/10">
                 <Icon className="h-5 w-5 text-purple-accent" aria-hidden="true" />
@@ -68,7 +75,7 @@ export default function ServicesPage() {
       <section
         id="request"
         aria-labelledby="service-request-heading"
-        className="mt-12 rounded-2xl border border-border bg-surface p-5 sm:p-8"
+        className="mt-12 scroll-mt-28 rounded-2xl border border-border bg-surface p-5 sm:p-8"
       >
         <div className="max-w-2xl">
           <h2 id="service-request-heading" className="text-2xl font-extrabold text-white">

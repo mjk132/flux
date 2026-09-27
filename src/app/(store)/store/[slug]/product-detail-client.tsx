@@ -59,10 +59,12 @@ export default function ProductDetailClient({ product }: { product: ProductInfo 
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Quiet add-to-cart under a loud buy-now: two equal heavy buttons
+          read as a decision the store refused to make. */}
       <Button
         onClick={handleAddToCart}
         disabled={product.stock <= 0}
-        variant="secondary"
+        variant="outline"
         size="lg"
         className="w-full"
       >

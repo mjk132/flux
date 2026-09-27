@@ -107,6 +107,17 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
     if (searchOpen) setTimeout(() => searchInputRef.current?.focus(), 60);
   }, [searchOpen]);
 
+  /* Escape closes the search dialog — without it the overlay had no
+     keyboard exit besides tabbing to the close button. */
+  useEffect(() => {
+    if (!searchOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSearchOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [searchOpen]);
+
   useEffect(() => {
     setMobileOpen(false);
     setSearchOpen(false);
@@ -150,7 +161,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="rounded-lg p-2 text-gray-text transition-colors hover:text-white lg:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-text transition-colors hover:text-white lg:hidden"
               aria-label="القائمة"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -160,7 +171,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
               <div className="relative h-9 w-9 overflow-hidden rounded-full ring-1 ring-white/10 transition-all group-hover:ring-purple-accent/40">
                 <Image
                   src="/logo.png"
-                  alt="Flux Store"
+                  alt="FLUX"
                   fill
                   className="object-cover"
                   priority
@@ -168,7 +179,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
               </div>
               <span className="flex items-baseline gap-1">
                 <span className="text-lg font-extrabold tracking-tight text-white">
-                  Flux
+                  FLUX
                 </span>
                 <span className="hidden text-[10px] font-semibold uppercase tracking-[0.28em] text-gray-muted sm:inline">
                   Store
@@ -197,8 +208,9 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
               </Link>
             ))}
 
-            {/* Categories dropdown */}
-            {categories.length > 0 && (
+            {/* Categories dropdown — needs two or more to be worth a menu;
+                a single category is already covered by the المتجر link */}
+            {categories.length > 1 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -243,7 +255,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="rounded-lg p-2 text-gray-text transition-colors hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-text transition-colors hover:text-white"
               aria-label="بحث"
             >
               <Search className="h-[18px] w-[18px]" />
@@ -251,20 +263,22 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
 
             <Link
               href="/wishlist"
-              className="relative hidden rounded-lg p-2 text-gray-text transition-colors hover:text-white sm:block"
+              className="relative hidden h-11 w-11 items-center justify-center rounded-lg text-gray-text transition-colors hover:text-white sm:flex"
               aria-label="المفضلة"
             >
-              <Heart className="h-[18px] w-[18px]" />
-              {wishlistCount > 0 && (
-                <span className="absolute -mt-6 mr-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-purple-accent px-1 text-[9px] font-bold text-white">
-                  {wishlistCount}
-                </span>
-              )}
+              <span className="relative block">
+                <Heart className="h-[18px] w-[18px]" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -left-2.5 -top-2.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-accent-solid px-1 text-[9px] font-bold text-white ring-2 ring-near-black">
+                    {wishlistCount}
+                  </span>
+                )}
+              </span>
             </Link>
 
             <Link
               href="/cart"
-              className="relative rounded-lg p-2 text-gray-text transition-colors hover:text-white"
+              className="relative flex h-11 w-11 items-center justify-center rounded-lg text-gray-text transition-colors hover:text-white"
               aria-label={cartCount > 0 ? `السلة، ${cartCount} منتج` : "السلة"}
             >
               {/* Keyed on the count so every addition restarts the pop, even
@@ -277,7 +291,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
               >
                 <ShoppingCart className="h-[18px] w-[18px]" />
                 {cartCount > 0 && (
-                  <span className="absolute -left-2.5 -top-2.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-purple-accent px-1 text-[9px] font-bold text-white ring-2 ring-near-black">
+                  <span className="absolute -left-2.5 -top-2.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-accent-solid px-1 text-[9px] font-bold text-white ring-2 ring-near-black">
                     {cartCount}
                   </span>
                 )}
@@ -291,7 +305,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 rounded-lg py-1.5 pl-1.5 pr-1 text-gray-text transition-colors hover:text-white"
+                    className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-text transition-colors hover:text-white"
                     aria-label="حسابي"
                   >
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-purple-accent to-violet text-[11px] font-bold text-white">
@@ -347,7 +361,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
             ) : (
               <Link
                 href="/auth/login"
-                className="hidden rounded-lg bg-purple-accent px-4 py-2 text-[13px] font-semibold text-white transition-all hover:bg-violet hover:shadow-[0_0_20px_rgba(124,58,237,0.35)] sm:inline-flex"
+                className="hidden h-10 items-center rounded-lg bg-accent-solid px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#1554c9] sm:inline-flex"
               >
                 دخول
               </Link>
@@ -356,7 +370,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
             {/* Mobile cart fallback */}
             <Link
               href="/auth/login"
-              className="rounded-lg p-2 text-gray-text hover:text-white lg:hidden sm:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-text hover:text-white lg:hidden sm:hidden"
               aria-label="دخول"
             >
               <User className="h-[18px] w-[18px]" />
@@ -388,27 +402,34 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
                 {link.label}
               </Link>
             ))}
-            <div className="my-2 h-px bg-border" />
-            <p className="px-3 pb-1 text-[11px] font-semibold text-gray-muted">
-              الأقسام
-            </p>
-            {categories.slice(0, 8).map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/store?category=${cat.slug}`}
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] text-gray-text transition-colors hover:text-white"
-              >
-                <span className="h-1 w-1 rounded-full bg-purple-accent/60" />
-                {cat.nameAr || cat.name}
-              </Link>
-            ))}
+            {/* Categories — only when there are any (the layout query now
+                excludes empty ones, so a zero result must not print a
+                label over a void) */}
+            {categories.length > 0 && (
+              <>
+                <div className="my-2 h-px bg-border" />
+                <p className="px-3 pb-1 text-[11px] font-semibold text-gray-muted">
+                  الأقسام
+                </p>
+                {categories.slice(0, 8).map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/store?category=${cat.slug}`}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] text-gray-text transition-colors hover:text-white"
+                  >
+                    <span className="h-1 w-1 rounded-full bg-purple-accent/60" />
+                    {cat.nameAr || cat.name}
+                  </Link>
+                ))}
+              </>
+            )}
             {!isAuthenticated && (
               <div className="flex gap-2 pt-3">
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileOpen(false)}
-                  className="flex-1 rounded-xl bg-purple-accent px-4 py-3 text-center text-sm font-semibold text-white"
+                  className="flex-1 rounded-xl bg-accent-solid px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-[#1554c9]"
                 >
                   دخول
                 </Link>
@@ -425,10 +446,19 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
         </div>
       </nav>
 
-      {/* Search overlay */}
+      {/* Search overlay — click the backdrop or press Escape to leave */}
       {searchOpen && (
-        <div className="fixed inset-0 z-[60] flex items-start justify-center bg-void/80 pt-24 backdrop-blur-md">
-          <div className="mx-4 w-full max-w-xl rounded-2xl border border-border bg-surface p-5 shadow-2xl shadow-black/50">
+        <div
+          className="fixed inset-0 z-[60] flex items-start justify-center bg-void/80 pt-24 backdrop-blur-md overscroll-contain"
+          onClick={() => setSearchOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="البحث في المتجر"
+            onClick={(e) => e.stopPropagation()}
+            className="mx-4 w-full max-w-xl rounded-2xl border border-border bg-surface p-5 shadow-2xl shadow-black/50"
+          >
             <form onSubmit={handleSearch} className="flex items-center gap-3">
               <Search className="h-5 w-5 flex-shrink-0 text-gray-muted" />
               <input
@@ -436,8 +466,10 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ابحث عن بوت، سكربت، موقع..."
-                className="flex-1 bg-transparent text-sm text-white placeholder:text-gray-muted focus:outline-none"
+                placeholder="ابحث عن بوت، سكربت، موقع…"
+                aria-label="ابحث في المتجر"
+                autoComplete="off"
+                className="flex-1 bg-transparent text-sm text-white placeholder:text-gray-muted"
                 dir="rtl"
               />
               <button
@@ -446,7 +478,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
                   setSearchOpen(false);
                   setSearchQuery("");
                 }}
-                className="rounded-lg p-1.5 text-gray-muted transition-colors hover:text-white"
+                className="-m-2 flex h-11 w-11 items-center justify-center rounded-lg text-gray-muted transition-colors hover:text-white"
                 aria-label="إغلاق"
               >
                 <X className="h-4 w-4" />

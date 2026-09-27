@@ -163,7 +163,7 @@ export default function WishlistPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="flex-1 rounded-lg bg-purple-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-violet"
+                      className="flex-1 rounded-lg bg-accent-solid px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#1554c9]"
                     >
                       أضف إلى السلة
                     </button>

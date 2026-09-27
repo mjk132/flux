@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Gamepad2, Globe } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 
 /**
  * The hero is the page's one orchestrated motion moment: copy blocks and
@@ -11,7 +12,21 @@ import { Gamepad2, Globe } from "lucide-react";
  * Copy rules: only claims the store can back up today (products exist,
  * PayPal checkout, delivery via account). No ratings, no "#1", no
  * fabricated trust badges — those live as a capability strip below.
+ *
+ * The visual centerpiece is the store's real lead product render inside
+ * the dark panel treatment (never the light "welcome" card — it fought
+ * both the palette and the message). With no product image available it
+ * falls back to a typographic FLUX plate in the same dark panel.
  */
+export interface HeroProduct {
+  slug: string;
+  name: string;
+  image: string;
+  category: string | null;
+  finalPrice: number;
+  wasPrice: number | null;
+}
+
 const offeringChips = [
   {
     icon: Gamepad2,
@@ -19,7 +34,6 @@ const offeringChips = [
     subtitle: "بوتات وسكربتات جاهزة",
     position: "right-0 top-8",
     hidden: "hidden sm:block",
-    iconBg: "bg-gradient-to-br from-fuchsia-500 to-violet",
   },
   {
     icon: Globe,
@@ -27,11 +41,10 @@ const offeringChips = [
     subtitle: "مواقع ولوحات تحكم",
     position: "bottom-12 -left-2",
     hidden: "hidden sm:block",
-    iconBg: "bg-gradient-to-br from-pink-500 to-purple-500",
   },
 ];
 
-export function HeroSection() {
+export function HeroSection({ product }: { product?: HeroProduct | null }) {
   return (
     <section className="relative overflow-hidden">
       {/* Layered background — follows the active palette (dark by default) */}
@@ -40,7 +53,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_5%_100%,rgba(90,162,255,0.12),transparent_60%)]" />
 
       <div className="relative mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-12 py-16 md:py-24 lg:grid-cols-2 lg:gap-8">
+        <div className="grid items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
           {/* ── Copy ── */}
           <div className="max-w-xl">
             {/* Brand line */}
@@ -58,7 +71,7 @@ export function HeroSection() {
                 />
               </div>
               <span className="text-[12px] font-semibold text-gray-text">
-                FLUX Development
+                FLUX
               </span>
               <span className="h-1 w-1 rounded-full bg-purple-accent" />
             </div>
@@ -88,13 +101,13 @@ export function HeroSection() {
             >
               <Link
                 href="/store"
-                className="group inline-flex h-12 items-center gap-2 rounded-xl bg-purple-accent px-7 text-[14px] font-bold text-[#ffffff] transition-all duration-300 hover:bg-[#1e6bff] active:scale-[0.98]"
+                className="group inline-flex h-12 items-center gap-2 rounded-lg bg-accent-solid px-7 text-[14px] font-bold text-[#ffffff] transition-[background-color,box-shadow,transform] duration-300 hover:bg-[#1554c9] active:scale-[0.98]"
               >
                 تصفح المتجر
               </Link>
               <Link
                 href="/services"
-                className="inline-flex h-12 items-center gap-2 rounded-xl border border-border bg-surface/60 px-6 text-[14px] font-semibold text-gray-text transition-all duration-300 hover:border-purple-accent/50 hover:text-white"
+                className="inline-flex h-12 items-center gap-2 rounded-lg border border-border bg-surface/60 px-6 text-[14px] font-semibold text-gray-text transition-[border-color,color] duration-300 hover:border-purple-accent/50 hover:text-white"
               >
                 اطلب خدمة
               </Link>
@@ -107,7 +120,7 @@ export function HeroSection() {
             style={{ animationDelay: "240ms" }}
           >
             {/* Soft glow behind */}
-            <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-accent/15 blur-[110px]" />
+            <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-accent/10 blur-[110px]" />
 
             {/* Offering chips — describe what FLUX actually sells (static:
                 no perpetual float; they ride the composition's entrance) */}
@@ -118,16 +131,17 @@ export function HeroSection() {
                 style={{ animationDelay: "440ms" }}
               >
                 <div className="flex items-center gap-2.5 rounded-2xl border border-border bg-surface/90 px-4 py-3 shadow-xl shadow-blue-500/10 backdrop-blur-md">
-                  <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-xl ${chip.iconBg}`}
-                  >
-                    <chip.icon className="h-4 w-4 text-[#ffffff]" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-accent/10 ring-1 ring-purple-accent/20">
+                    <chip.icon
+                      className="h-4 w-4 text-purple-accent"
+                      aria-hidden="true"
+                    />
                   </div>
                   <div>
-                    <p className="text-[11px] font-bold text-white">
+                    <p className="text-[12px] font-bold text-white">
                       {chip.title}
                     </p>
-                    <p className="text-[10px] text-gray-muted">
+                    <p className="text-[11px] text-gray-muted">
                       {chip.subtitle}
                     </p>
                   </div>
@@ -135,20 +149,96 @@ export function HeroSection() {
               </div>
             ))}
 
-            {/* Main image card */}
+            {/* Main plate — the real lead product inside the dark panel
+                treatment; a typographic FLUX plate when there is none */}
             <div className="relative z-[5] mx-auto w-[88%] sm:w-[80%]">
-              <div className="rounded-[28px] bg-surface p-2 shadow-[0_30px_80px_-20px_rgba(47,123,255,0.45)] ring-1 ring-border">
-                <div className="relative aspect-square overflow-hidden rounded-[20px] bg-gradient-to-br from-blue-100 to-indigo-100">
-                  <Image
-                    src="/flux-welcome-square.webp"
-                    alt="FLUX"
-                    fill
-                    sizes="(max-width: 768px) 88vw, (max-width: 1024px) 80vw, 520px"
-                    className="object-cover"
-                    priority
-                  />
+              {product ? (
+                <Link
+                  href={`/store/${product.slug}`}
+                  aria-label={`${product.name} — عرض المنتج`}
+                  className="group block rounded-[28px] bg-surface p-2 shadow-[0_30px_80px_-24px_rgba(47,123,255,0.28)] ring-1 ring-border transition-shadow duration-300 hover:shadow-[0_36px_90px_-26px_rgba(47,123,255,0.4)]"
+                >
+                  <div className="relative aspect-square overflow-hidden rounded-[20px] flux-dark-panel bg-void">
+                    {/* Panel light + hairline grid (same material as the
+                        product cards' generated art, so the homepage and
+                        the store speak one visual language) */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.07),transparent_55%)]" />
+                    <div
+                      className="absolute inset-0 opacity-25"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
+                        backgroundSize: "28px 28px",
+                        maskImage:
+                          "radial-gradient(circle at 50% 45%, black, transparent 78%)",
+                        WebkitMaskImage:
+                          "radial-gradient(circle at 50% 45%, black, transparent 78%)",
+                      }}
+                    />
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 88vw, (max-width: 1024px) 80vw, 560px"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                      priority
+                    />
+
+                    {/* Real name + real price, riding the composition */}
+                    <div
+                      className="animate-flux-up absolute inset-x-3 bottom-3 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-near-black/85 px-3.5 py-2.5 backdrop-blur-md"
+                      style={{ animationDelay: "600ms" }}
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-[13px] font-bold text-white">
+                          {product.name}
+                        </p>
+                        {product.category && (
+                          <p className="truncate text-[11px] text-gray-muted">
+                            {product.category}
+                          </p>
+                        )}
+                      </div>
+                      <div className="shrink-0 text-left">
+                        <p className="text-[15px] font-extrabold text-white tabular-nums">
+                          {formatPrice(product.finalPrice)}
+                        </p>
+                        {product.wasPrice !== null && (
+                          <p className="text-[11px] text-gray-muted line-through tabular-nums">
+                            {formatPrice(product.wasPrice)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ) : (
+                /* Identity fallback: dark panel, wordmark, no invented
+                   imagery and no light pastel card in a dark hero */
+                <div className="rounded-[28px] bg-surface p-2 shadow-[0_30px_80px_-24px_rgba(47,123,255,0.28)] ring-1 ring-border">
+                  <div className="relative flex aspect-square flex-col items-center justify-center gap-3 overflow-hidden rounded-[20px] flux-dark-panel bg-void">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(47,123,255,0.12),transparent_60%)]" />
+                    <div
+                      className="absolute inset-0 opacity-25"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
+                        backgroundSize: "28px 28px",
+                        maskImage:
+                          "radial-gradient(circle at 50% 45%, black, transparent 78%)",
+                        WebkitMaskImage:
+                          "radial-gradient(circle at 50% 45%, black, transparent 78%)",
+                      }}
+                    />
+                    <p className="relative text-4xl font-extrabold tracking-tight text-white">
+                      FLUX
+                    </p>
+                    <p className="relative text-[12px] text-gray-muted">
+                      منتجات رقمية وتطوير مخصص
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Bottom gradient fade */}

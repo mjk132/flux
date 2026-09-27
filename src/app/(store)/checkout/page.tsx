@@ -204,7 +204,7 @@ export default function CheckoutPage() {
           </p>
           <Link
             href="/store"
-            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-purple-accent px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-violet"
+            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-accent-solid px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#1554c9]"
           >
             <ShoppingBag className="h-4 w-4" />
             تصفح المنتجات

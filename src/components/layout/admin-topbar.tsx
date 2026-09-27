@@ -46,7 +46,7 @@ export function AdminTopbar() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="بحث..."
-            className="h-9 w-64 rounded-lg border border-border bg-surface pr-9 pl-3 text-sm text-white placeholder:text-gray-text/60 focus:border-purple-accent focus:outline-none focus:ring-1 focus:ring-purple-accent/30 lg:w-80"
+            className="h-9 w-64 rounded-lg border border-border bg-surface pr-9 pl-3 text-sm text-white placeholder:text-gray-muted focus:border-purple-accent focus:outline-none focus:ring-1 focus:ring-purple-accent/30 lg:w-80"
           />
         </div>
       </form>

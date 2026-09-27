@@ -23,6 +23,7 @@ function FaqItem({ faq, index }: { faq: FAQ; index: number }) {
       )}
     >
       <button
+        type="button"
         onClick={() => setOpen(!open)}
         className="flex w-full items-center gap-4 px-5 py-4 text-start"
         aria-expanded={open}
@@ -44,7 +45,7 @@ function FaqItem({ faq, index }: { faq: FAQ; index: number }) {
         )}
       >
         <div className="overflow-hidden">
-          <p className="px-5 pb-5 text-[13px] leading-relaxed text-gray-text">
+          <p className="px-5 pb-5 text-[14px] leading-relaxed text-gray-text">
             {faq.answer}
           </p>
         </div>
@@ -74,7 +75,7 @@ export function FaqSection({ faqs }: FaqSectionProps) {
           </p>
           <Link
             href="/faq"
-            className="mt-6 inline-flex items-center rounded-xl border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-all hover:border-purple-accent/50 hover:text-white"
+            className="mt-6 inline-flex items-center rounded-lg border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-[border-color,color] duration-300 hover:border-purple-accent/50 hover:text-white"
           >
             عرض كل الأسئلة
           </Link>

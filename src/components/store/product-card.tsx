@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Heart, ShoppingCart, Star, Flame } from "lucide-react";
+import { Heart, ShoppingCart, Star, Flame, Check } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { useWishlistStore } from "@/store/wishlist";
 import { useToast } from "@/components/ui/toast";
@@ -49,6 +50,10 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const toggle = useWishlistStore((s) => s.toggle);
   const isInWishlist = useWishlistStore((s) => s.isInWishlist(product.id));
   const { success } = useToast();
+  /* Inline confirmation at the point of action: the toast can scroll out
+     of view while you are still looking at the card, so the button itself
+     reports the result for two seconds. */
+  const [added, setAdded] = useState(false);
 
   const primaryImage = product.images?.[0];
   // Everything pricing-related comes from the same helper checkout uses.
@@ -80,6 +85,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
       image: primaryImage?.url || "/logo.png",
       stock: product.stock,
     });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
     success("أُضيفت إلى السلة", `${name} — ${formatPrice(salePrice)}`, {
       label: "عرض السلة",
       href: "/cart",
@@ -135,12 +142,13 @@ export function ProductCard({ product, className }: ProductCardProps) {
           )}
         </div>
 
-        {/* Wishlist — above the stretched link overlay */}
+        {/* Wishlist — above the stretched link overlay. 44×44 hit area
+            (icon stays small); the visual disc is the button itself. */}
         <button
           type="button"
           onClick={handleToggleWishlist}
           className={cn(
-            "absolute left-3 top-3 z-20 rounded-full p-2 transition-all duration-200",
+            "absolute left-3 top-3 z-20 flex h-11 w-11 items-center justify-center rounded-full transition-[background-color,color,opacity] duration-200",
             isInWishlist
               ? "bg-danger/20 text-danger"
               : "bg-void/50 text-gray-text backdrop-blur-sm hover:text-white sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
@@ -161,7 +169,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-4">
-        <span className="text-[11px] font-semibold text-gray-muted">
+        <span className="text-[12px] font-semibold text-gray-muted">
           {product.category?.nameAr || product.category?.name || "FLUX"}
         </span>
 
@@ -192,7 +200,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
                 />
               ))}
             </div>
-            <span className="text-[11px] text-gray-muted">
+            <span className="text-[12px] text-gray-muted">
               {avgRating.toFixed(1)}
               {ratingCount > 0 && ` (${ratingCount})`}
             </span>
@@ -201,18 +209,18 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
         {/* Description */}
         {product.shortDescription && (
-          <p className="mt-1.5 line-clamp-1 text-[12px] text-gray-text">
+          <p className="mt-1.5 line-clamp-1 text-[13px] text-gray-text">
             {product.shortDescription}
           </p>
         )}
 
         {/* Price */}
         <div className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-0.5 pt-3">
-          <span className="text-[18px] font-extrabold text-white">
+          <span className="text-[18px] font-extrabold tabular-nums text-white">
             {formatPrice(salePrice)}
           </span>
           {wasPrice !== null && (
-            <span className="text-[12px] text-gray-muted line-through">
+            <span className="text-[12px] tabular-nums text-gray-muted line-through">
               {formatPrice(wasPrice)}
             </span>
           )}
@@ -224,14 +232,20 @@ export function ProductCard({ product, className }: ProductCardProps) {
           onClick={handleAddToCart}
           disabled={outOfStock}
           className={cn(
-            "relative z-20 mt-3 flex h-10 items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all duration-200 active:scale-[0.98]",
+            "relative z-20 mt-3 flex h-11 items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold transition-all duration-200 active:scale-[0.98]",
             outOfStock
               ? "cursor-not-allowed border border-border text-gray-muted"
-              : "bg-purple-accent text-white hover:bg-violet hover:shadow-[0_0_16px_rgba(47,123,255,0.35)]"
+              : added
+                ? "bg-accent-solid text-white"
+                : "bg-accent-solid text-white hover:bg-[#1554c9] hover:shadow-[0_8px_24px_-12px_rgba(47,123,255,0.5)]"
           )}
         >
-          <ShoppingCart className="h-4 w-4" />
-          {outOfStock ? "نفد المخزون" : "أضف للسلة"}
+          {added ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <ShoppingCart className="h-4 w-4" />
+          )}
+          {outOfStock ? "نفد المخزون" : added ? "تمت الإضافة" : "أضف للسلة"}
         </button>
       </div>
     </article>

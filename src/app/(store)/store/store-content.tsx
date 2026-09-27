@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -22,6 +22,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { ProductGrid } from "@/components/store/product-grid";
+import { FeaturedProduct } from "@/components/store/featured-product";
 import { cn } from "@/lib/utils";
 import type { ProductCardData } from "@/components/store/product-card";
 
@@ -148,6 +149,13 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
   );
   const [loading, setLoading] = useState(!initial);
   const [showFilters, setShowFilters] = useState(false);
+  /* A filter/sort/page change is a server navigation; wrapping it in a
+     transition lets the toolbar show pending state instead of silently
+     freezing until the new HTML arrives. */
+  const [isPending, startTransition] = useTransition();
+  /* Network failure is NOT an empty result set — it gets its own state
+     with a retry, so a dropped fetch never renders "لا توجد نتائج". */
+  const [errored, setErrored] = useState(false);
 
   const currentSearch = routeParams.search || "";
   const currentCategory = routeParams.category || "";
@@ -178,8 +186,10 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
       const data = await res.json();
       setProducts(data.products || []);
       setPagination(data.pagination || null);
+      setErrored(false);
     } catch {
       setProducts([]);
+      setErrored(true);
     } finally {
       setLoading(false);
     }
@@ -212,6 +222,7 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
       setProducts(initial.products);
       setPagination(initial.pagination);
       setLoading(false);
+      setErrored(false);
       return;
     }
     fetchProducts();
@@ -242,11 +253,13 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
        page change and must keep the value it just sets (the old code
        unconditionally deleted `page`, so page 2 always bounced back
        to page 1). */
-    router.push(
-      buildStoreUrl(
-        key === "page" ? { page: value } : { [key]: value, page: "" }
-      )
-    );
+    startTransition(() => {
+      router.push(
+        buildStoreUrl(
+          key === "page" ? { page: value } : { [key]: value, page: "" }
+        )
+      );
+    });
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -255,7 +268,7 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
   };
 
   const clearFilters = () => {
-    router.push("/store");
+    startTransition(() => router.push("/store"));
     setSearchInput("");
     setMinPriceInput("");
     setMaxPriceInput("");
@@ -264,7 +277,9 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
   /** Clears both price bounds in a single navigation (two sequential
    *  updateParams calls would race and restore the first value). */
   const clearPriceRange = () => {
-    router.push(buildStoreUrl({ minPrice: "", maxPrice: "", page: "" }));
+    startTransition(() =>
+      router.push(buildStoreUrl({ minPrice: "", maxPrice: "", page: "" }))
+    );
   };
 
   // Keep the inputs in sync when the URL changes from outside
@@ -295,6 +310,23 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
 
   const activeCategory = categories.find((c) => c.slug === currentCategory);
   const activeType = PRODUCT_TYPES.find((t) => t.value === currentProductType);
+
+  /* Sidebar categories: the server page already excludes empty ones; this
+     covers the client-API fallback too. The active chip is always kept so
+     a category that just emptied can still be exited. */
+  const filterableCategories = categories.filter(
+    (c) => c._count.products > 0 || c.slug === currentCategory
+  );
+
+  /* With a single result there is nothing to narrow — hide the price and
+     type controls unless they are (or were) part of the active query.
+     A filter panel that can only ever return one row is dead UI. */
+  const totalResults = pagination?.total ?? products.length;
+  const showNarrowFilters =
+    totalResults > 1 ||
+    !!currentMinPrice ||
+    !!currentMaxPrice ||
+    !!currentProductType;
   const hasFilters = !!(
     currentCategory ||
     currentMinPrice ||
@@ -369,7 +401,7 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
               جميع المنتجات
             </span>
           </button>
-          {categories.map((cat) => {
+          {filterableCategories.map((cat) => {
             const active = currentCategory === cat.slug;
             return (
               <button
@@ -401,31 +433,36 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
         </div>
       </FilterSection>
 
-      {/* Price range */}
-      <FilterSection title="نطاق السعر">
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="من"
-            value={minPriceInput}
-            onChange={(e) => setMinPriceInput(e.target.value)}
-            className="h-9 w-full rounded-lg border border-border bg-void px-3 text-sm text-white placeholder:text-gray-text/60 focus:border-purple-accent focus:outline-none focus:ring-1 focus:ring-purple-accent/30"
-          />
-          <span className="h-px w-3 shrink-0 bg-border" />
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="إلى"
-            value={maxPriceInput}
-            onChange={(e) => setMaxPriceInput(e.target.value)}
-            className="h-9 w-full rounded-lg border border-border bg-void px-3 text-sm text-white placeholder:text-gray-text/60 focus:border-purple-accent focus:outline-none focus:ring-1 focus:ring-purple-accent/30"
-          />
-        </div>
-      </FilterSection>
+      {/* Price range — only when there is something left to narrow */}
+      {showNarrowFilters && (
+        <FilterSection title="نطاق السعر">
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="من"
+              aria-label="السعر الأدنى بالدولار"
+              value={minPriceInput}
+              onChange={(e) => setMinPriceInput(e.target.value)}
+              className="h-9 w-full rounded-lg border border-border bg-void px-3 text-sm text-white placeholder:text-gray-muted focus:border-purple-accent focus:outline-none focus:ring-1 focus:ring-purple-accent/30"
+            />
+            <span className="h-px w-3 shrink-0 bg-border" />
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="إلى"
+              aria-label="السعر الأعلى بالدولار"
+              value={maxPriceInput}
+              onChange={(e) => setMaxPriceInput(e.target.value)}
+              className="h-9 w-full rounded-lg border border-border bg-void px-3 text-sm text-white placeholder:text-gray-muted focus:border-purple-accent focus:outline-none focus:ring-1 focus:ring-purple-accent/30"
+            />
+          </div>
+        </FilterSection>
+      )}
 
       {/* Product type */}
-      <FilterSection title="نوع المنتج">
+      {showNarrowFilters && (
+        <FilterSection title="نوع المنتج">
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -455,7 +492,8 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
             </button>
           ))}
         </div>
-      </FilterSection>
+        </FilterSection>
+      )}
     </div>
   );
 
@@ -509,8 +547,9 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
         )}
       </header>
 
-      {/* ── Toolbar ── */}
-      <div className="sticky top-[68px] z-30 -mx-4 mb-6 border-b border-border/50 bg-void/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      {/* ── Toolbar — sticky on sm+ only: on phones the two sticky rows
+             ate ~110px of a 640px viewport ── */}
+      <div className="relative z-30 -mx-4 mb-6 border-b border-border/50 bg-void/90 px-4 py-3 backdrop-blur-xl sm:sticky sm:top-[68px] sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <form onSubmit={handleSearch} className="flex gap-2 sm:max-w-md">
             <div className="relative flex-1">
@@ -519,8 +558,10 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="ابحث عن بوت، سكربت، تصميم..."
-                className="h-10 w-full rounded-lg border border-border bg-surface pr-10 pl-4 text-sm text-white placeholder:text-gray-text/60 focus:border-purple-accent focus:outline-none focus:ring-1 focus:ring-purple-accent/30"
+                placeholder="ابحث عن بوت، سكربت، تصميم…"
+                aria-label="ابحث في المتجر"
+                autoComplete="off"
+                className="h-10 w-full rounded-lg border border-border bg-surface pr-10 pl-4 text-sm text-white placeholder:text-gray-muted focus:border-purple-accent focus:outline-none focus:ring-1 focus:ring-purple-accent/30"
               />
             </div>
             <Button type="submit" size="sm" className="h-10 px-4">
@@ -581,13 +622,37 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
           <div className="md:sticky md:top-[152px]">{filterPanel}</div>
         </aside>
 
-        {/* ── Products ── */}
-        <div className="min-w-0 flex-1">
+        {/* ── Products — dims while a filter navigation is in flight ── */}
+        <div
+          aria-busy={isPending}
+          className={cn(
+            "min-w-0 flex-1 transition-opacity duration-200",
+            isPending && "opacity-60"
+          )}
+        >
           {loading ? (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 min-[440px]:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: 12 }).map((_, i) => (
                 <ProductSkeleton key={i} />
               ))}
+            </div>
+          ) : errored ? (
+            /* A dropped fetch is a failure, not an empty shelf */
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
+              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-surface">
+                <SearchX className="h-7 w-7 text-gray-muted" />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                تعذّر تحميل المنتجات
+              </h3>
+              <p className="mb-5 mt-1.5 max-w-sm text-[13.5px] text-gray-text">
+                مشكلة في الاتصال بالخادم. لم نفقد شيئًا — أعد المحاولة وستظهر
+                النتائج.
+              </p>
+              <Button variant="secondary" onClick={() => fetchProducts()}>
+                <Package className="me-2 h-4 w-4" />
+                إعادة المحاولة
+              </Button>
             </div>
           ) : products.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
@@ -609,7 +674,17 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
             </div>
           ) : (
             <>
-              <ProductGrid products={products as unknown as ProductCardData[]} />
+              {/* One result earns the featured band, not a lone card in a
+                  four-column grid */}
+              {products.length === 1 ? (
+                <FeaturedProduct
+                  product={products[0] as unknown as ProductCardData}
+                />
+              ) : (
+                <ProductGrid
+                  products={products as unknown as ProductCardData[]}
+                />
+              )}
 
               {/* Pagination */}
               {pagination && pagination.totalPages > 1 && (
@@ -657,7 +732,7 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
                           className={cn(
                             "flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-medium transition-all duration-200",
                             currentPage === p
-                              ? "bg-purple-accent text-white shadow-[0_6px_18px_-8px_rgba(47,123,255,0.8)]"
+                              ? "bg-accent-solid text-white shadow-[0_6px_18px_-8px_rgba(47,123,255,0.8)]"
                               : "text-gray-text hover:bg-surface hover:text-white"
                           )}
                         >

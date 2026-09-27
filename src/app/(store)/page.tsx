@@ -1,14 +1,15 @@
 import {
   CreditCard,
   PackageCheck,
-  Wrench,
   MessagesSquare,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { getSalePrice } from "@/lib/pricing";
 import { HeroSection } from "@/components/store/hero-section";
 import { CategoryCard } from "@/components/store/category-card";
 import { ProductGrid } from "@/components/store/product-grid";
+import { FeaturedProduct } from "@/components/store/featured-product";
 import { WhyFluxSection } from "@/components/store/why-flux-section";
 import { ReviewsSection } from "@/components/store/reviews-section";
 import { FaqSection } from "@/components/store/faq-section";
@@ -71,9 +72,11 @@ function toCard(
   };
 }
 
-/* Capability strip: statements that are true from day one, regardless of
-   how many orders or reviews the store has. Replaces the old stats row
-   that printed "0 تقييم موثق" / "0.0 متوسط التقييم" to every visitor. */
+/* Capability strip: purely transactional one-liners — how you pay, where
+   the product lands, where you get help. True from day one regardless of
+   orders or reviews. Deliberately does NOT restate "تطوير مخصص": that idea
+   belongs to the services section and the Why-FLUX statement below, and
+   printing it twice in one scroll reads as filler. */
 const capabilities = [
   {
     icon: CreditCard,
@@ -83,17 +86,12 @@ const capabilities = [
   {
     icon: PackageCheck,
     title: "التسليم عبر حسابك",
-    desc: "المنتجات الرقمية تظهر في حسابك بعد اعتماد الدفع.",
-  },
-  {
-    icon: Wrench,
-    title: "تطوير مخصص",
-    desc: "ديسكورد، FiveM، مواقع، لوحات تحكم وبرمجة مخصصة.",
+    desc: "المنتج الرقمي يظهر في حسابك بعد اعتماد الدفع.",
   },
   {
     icon: MessagesSquare,
     title: "دعم عبر الديسكورد",
-    desc: "للاستفسار والطلب والمساعدة بعد الشراء.",
+    desc: "للاستفسار قبل الشراء والمساعدة بعده.",
   },
 ];
 
@@ -145,6 +143,23 @@ export default async function HomePage() {
   const discordUrl =
     settings.find((s) => s.key === "discord_link")?.value || "";
 
+  /* The hero centerpiece is the real lead product — its actual render,
+     name and actual sale price from the query above. Never invented. */
+  const lead = products[0];
+  const leadImage = lead?.images?.[0]?.url ?? null;
+  const leadSale = lead ? getSalePrice(lead) : null;
+  const heroProduct =
+    lead && leadImage && leadSale
+      ? {
+          slug: lead.slug,
+          name: lead.nameAr || lead.name,
+          image: leadImage,
+          category: lead.category?.nameAr || lead.category?.name || null,
+          finalPrice: leadSale.final,
+          wasPrice: leadSale.was,
+        }
+      : null;
+
   /* Category tiles only for categories that actually hold products, and
      the section only earns its place once there are two or more — a
      single "0 منتج" tile is a dead end, not navigation. */
@@ -156,22 +171,22 @@ export default async function HomePage() {
   return (
     <div className="bg-void">
       {/* ═══════════ HERO ═══════════ */}
-      <HeroSection />
+      <HeroSection product={heroProduct} />
 
       {/* ═══════════ CAPABILITIES (always true) ═══════════ */}
       <section className="border-b border-border/40 bg-surface/40">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-px px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-px px-4 sm:grid-cols-3 sm:px-6 lg:px-8">
           {capabilities.map((s) => (
             <div
               key={s.title}
-              className="flex items-start gap-3 border-b border-border/40 px-2 py-6 lg:border-b-0 lg:px-6 lg:[&:not(:last-child)]:border-l"
+              className="flex items-start gap-3 border-b border-border/40 px-2 py-6 last:border-b-0 sm:border-b-0 sm:px-6 sm:[&:not(:last-child)]:border-l"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-accent/10 ring-1 ring-purple-accent/20">
                 <s.icon className="h-5 w-5 text-purple-accent" />
               </div>
               <div>
                 <p className="text-[14px] font-bold text-white">{s.title}</p>
-                <p className="mt-0.5 text-[12px] leading-relaxed text-gray-muted">
+                <p className="mt-0.5 text-[13px] leading-relaxed text-gray-muted">
                   {s.desc}
                 </p>
               </div>
@@ -213,7 +228,14 @@ export default async function HomePage() {
               href="/store"
               actionLabel="كل المنتجات"
             />
-            <ProductGrid products={products.map(toCard)} />
+            {/* One product earns a full-width featured band instead of a
+                single card lost in a four-column grid — the layout never
+                promises inventory the store doesn't have. */}
+            {products.length === 1 ? (
+              <FeaturedProduct product={toCard(products[0])} />
+            ) : (
+              <ProductGrid products={products.map(toCard)} />
+            )}
           </div>
         </section>
       )}

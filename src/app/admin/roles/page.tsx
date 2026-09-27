@@ -214,9 +214,9 @@ export default function AdminRoles() {
               <button
                 onClick={handleRoleChange}
                 disabled={!selectedUser || !selectedRole || updating}
-                className="inline-flex h-10 items-center justify-center rounded-lg bg-purple-accent px-4 text-sm font-medium text-white transition-colors hover:bg-violet disabled:pointer-events-none disabled:opacity-50"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-accent-solid px-4 text-sm font-medium text-white transition-colors hover:bg-[#1554c9] disabled:pointer-events-none disabled:opacity-50"
               >
-                {updating ? "جاري التحديث..." : "تحديث الدور"}
+                {updating ? "جاري التحديث…" : "تحديث الدور"}
               </button>
             </div>
           </CardContent>

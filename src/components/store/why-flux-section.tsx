@@ -1,44 +1,38 @@
 import Link from "next/link";
-import {
-  Wallet,
-  ShieldCheck,
-  Wrench,
-  MessagesSquare,
-} from "lucide-react";
 
 /**
- * "Why FLUX" — four truthful capabilities, presented as a divided list
- * (not another grid of identical cards, which every other section uses).
- * Each line states something the store can actually demonstrate today:
- * account-based delivery, published pricing, custom development, and
- * Discord support. No numbers, no guarantees we don't offer.
+ * "Why FLUX" — the brand statement, deliberately in a different voice
+ * from everything around it. The capability strip above the fold lists
+ * transaction mechanics (pay / delivery / support) as icon columns;
+ * this section says what FLUX *is* — a store and a workshop run by one
+ * team — as three typographic rows with hairline dividers. No icon
+ * boxes, no cards: if both blocks printed the same four promises, the
+ * page read as filler.
+ *
+ * Every row states something the store can demonstrate today: published
+ * pricing with PayPal checkout, agreement before custom work starts, and
+ * Discord as the single channel. No numbers, no guarantees we don't offer.
  */
-const capabilities = [
+const positions = [
   {
-    icon: Wallet,
-    title: "ادفع وتعرف السعر قبل الشراء",
-    desc: "الأسعار والخصومات معلنة على كل منتج، والدفع عبر PayPal مع رفع صورة الإيصال في صفحة الطلب.",
+    title: "منتجات جاهزة تشتريها الآن",
+    desc: "بوتات وسكربتات ومنصات منشورة بسعر واضح — تختار، تدفع عبر PayPal، ويظهر المنتج في حسابك بعد اعتماد الدفع.",
   },
   {
-    icon: ShieldCheck,
-    title: "التسليم عبر حسابك",
-    desc: "المنتجات الرقمية تظهر في حسابك بعد اعتماد الدفع — لا رسائل خاصة ولا انتظار شحن.",
+    title: "تطوير يبدأ من فكرتك",
+    desc: "موقع أو لوحة تحكم أو نظام مخصص يُبنى لطلبك — نتفق على التفاصيل والسعر قبل البدء، بلا مفاجآت في النهاية.",
   },
   {
-    icon: Wrench,
-    title: "تطوير مخصص عند الحاجة",
-    desc: "ديسكورد، FiveM، مواقع، لوحات تحكم وبرمجة مخصصة — اطلب الخدمة وسيتم الاتفاق على التفاصيل قبل البدء.",
-  },
-  {
-    icon: MessagesSquare,
-    title: "دعم عبر الديسكورد",
-    desc: "للاستفسار قبل الشراء أو للمساعدة بعده، سيرفر الديسكورد هو قناة التواصل المباشر معنا.",
+    title: "فريق واحد، وقناة واحدة",
+    desc: "نفس الفريق خلف المنتجات والخدمات، والتواصل والدعم عبر سيرفر الديسكورد مباشرة.",
   },
 ];
 
 export function WhyFluxSection() {
   return (
-    <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
+    /* Peak spacing: the statement band breathes more than the utility
+       bands around it (py-16) so the page has one moment of air. */
+    <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
       <div className="grid gap-10 lg:grid-cols-[1fr_1.35fr] lg:gap-14">
         {/* Statement */}
         <div className="relative">
@@ -46,7 +40,7 @@ export function WhyFluxSection() {
             <p className="mb-2 text-[12px] font-bold text-purple-accent">
               لماذا FLUX؟
             </p>
-            <h2 className="text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">
+            <h2 className="text-2xl font-extrabold leading-snug text-white sm:text-3xl lg:text-4xl text-balance">
               متجر منتجات، وورشة تطوير — في مكان واحد
             </h2>
             <p className="mt-4 max-w-md text-[14px] leading-relaxed text-gray-text">
@@ -55,26 +49,23 @@ export function WhyFluxSection() {
             </p>
             <Link
               href="/services"
-              className="mt-6 inline-flex items-center rounded-xl border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-all hover:border-purple-accent/50 hover:text-white"
+              className="mt-6 inline-flex items-center rounded-lg border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-[border-color,color] duration-300 hover:border-purple-accent/50 hover:text-white"
             >
               تعرّف على الخدمات
             </Link>
           </div>
         </div>
 
-        {/* Capabilities — divided rows, deliberately NOT another card grid */}
+        {/* Positioning — divided typographic rows, no icon boxes */}
         <div className="divide-y divide-border/60 border-y border-border/60">
-          {capabilities.map((f) => (
-            <div key={f.title} className="flex gap-4 py-6 sm:gap-5 sm:py-7">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-accent/10 text-purple-accent ring-1 ring-purple-accent/20">
-                <f.icon className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="text-[15px] font-bold text-white">{f.title}</h3>
-                <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-gray-text">
-                  {f.desc}
-                </p>
-              </div>
+          {positions.map((f) => (
+            <div key={f.title} className="py-7 sm:py-8">
+              <h3 className="text-[17px] font-bold text-white sm:text-lg">
+                {f.title}
+              </h3>
+              <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-gray-text">
+                {f.desc}
+              </p>
             </div>
           ))}
         </div>

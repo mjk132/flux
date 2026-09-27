@@ -65,7 +65,12 @@ export default async function StoreRoute({
       sort: first(sp.sort) || null,
     }),
     prisma.category.findMany({
-      where: { isVisible: true },
+      /* Sidebar categories must hold a published product — otherwise the
+         filter offers chips that can only ever return zero results. */
+      where: {
+        isVisible: true,
+        products: { some: { status: "PUBLISHED" } },
+      },
       orderBy: { sortOrder: "asc" },
       select: {
         id: true,

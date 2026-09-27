@@ -21,7 +21,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={theme === "light" ? "تفعيل الوضع الليلي" : "تفعيل الوضع النهاري"}
       title={theme === "light" ? "الوضع الليلي" : "الوضع النهاري"}
       className={cn(
-        "group relative inline-flex h-9 w-9 items-center justify-center rounded-full",
+        "group relative flex h-11 w-11 items-center justify-center rounded-full",
         "text-gray-text transition-colors duration-300",
         "hover:bg-surface-raised hover:text-white",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-accent/50",

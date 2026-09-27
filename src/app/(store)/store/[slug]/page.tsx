@@ -6,6 +6,7 @@ import { formatPrice } from "@/lib/utils";
 import { getSalePrice } from "@/lib/pricing";
 import type { Metadata } from "next";
 import { Star, ChevronLeft, Package } from "lucide-react";
+import { ProductGallery } from "@/components/store/product-gallery";
 import ProductDetailClient from "./product-detail-client";
 
 // Static + ISR. Product pages are prerendered for every published slug at
@@ -106,7 +107,7 @@ export default async function ProductDetailPage({ params }: Props) {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-sm text-gray-text">
         <Link href="/" className="hover:text-white transition-colors">
@@ -130,48 +131,13 @@ export default async function ProductDetailPage({ params }: Props) {
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        {/* Product Images */}
+        {/* Product Images — interactive: thumbnails switch the main frame */}
         <div>
-          <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-deep-purple">
-            {product.images.length > 0 ? (
-              <Image
-                src={product.images[0].url}
-                alt={product.images[0].alt || product.name}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-gray-text">
-                <Package className="h-24 w-24" />
-              </div>
-            )}
-            {sale.percent > 0 && (
-              <span className="absolute right-4 top-4 rounded-full bg-danger px-3 py-1 text-sm font-bold text-white">
-                -{sale.percent}%
-              </span>
-            )}
-          </div>
-
-          {product.images.length > 1 && (
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {product.images.slice(0, 4).map((img) => (
-                <div
-                  key={img.id}
-                  className="relative aspect-square overflow-hidden rounded-lg border border-border bg-deep-purple"
-                >
-                  <Image
-                    src={img.url}
-                    alt={img.alt || product.name}
-                    fill
-                    sizes="(max-width: 1024px) 25vw, 12vw"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          <ProductGallery
+            images={product.images}
+            name={product.nameAr || product.name}
+            discountPercent={sale.percent}
+          />
         </div>
 
         {/* Product Info */}
@@ -192,7 +158,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     className={`h-4 w-4 ${
                       i <= Math.round(avgRating)
                         ? "fill-amber-400 text-amber-400"
-                        : "text-gray-600"
+                        : "text-faint"
                     }`}
                   />
                 ))}
@@ -204,11 +170,11 @@ export default async function ProductDetailPage({ params }: Props) {
           )}
 
           <div className="mb-6 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-purple-accent">
+            <span className="text-3xl font-extrabold tabular-nums text-white">
               {formatPrice(finalPrice)}
             </span>
             {sale.was !== null && (
-              <span className="text-lg text-gray-text line-through">
+              <span className="text-lg tabular-nums text-gray-muted line-through">
                 {formatPrice(sale.was)}
               </span>
             )}
@@ -371,7 +337,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 className="rounded-2xl border border-border bg-surface p-4"
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-accent text-xs font-bold text-white">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-solid text-xs font-bold text-white">
                     {review.user.name.charAt(0)}
                   </div>
                   <div>
@@ -385,7 +351,7 @@ export default async function ProductDetailPage({ params }: Props) {
                           className={`h-3 w-3 ${
                             i <= review.rating
                               ? "fill-amber-400 text-amber-400"
-                              : "text-gray-600"
+                              : "text-faint"
                           }`}
                         />
                       ))}
@@ -405,7 +371,15 @@ export default async function ProductDetailPage({ params }: Props) {
       {relatedProducts.length > 0 && (
         <section className="mt-12 border-t border-border pt-8">
           <h2 className="mb-6 text-xl font-bold text-white">منتجات ذات صلة</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div
+            className={
+              relatedProducts.length <= 2
+                ? "grid grid-cols-1 gap-3 min-[440px]:grid-cols-2 sm:gap-4"
+                : relatedProducts.length === 3
+                  ? "grid grid-cols-1 gap-3 min-[440px]:grid-cols-2 sm:grid-cols-3 sm:gap-4"
+                  : "grid grid-cols-2 gap-4 sm:grid-cols-4"
+            }
+          >
             {relatedProducts.map((p) => {
               const pAvg =
                 p.reviews.length > 0
@@ -436,7 +410,7 @@ export default async function ProductDetailPage({ params }: Props) {
                         </div>
                       )}
                       {pSale.percent > 0 && (
-                        <span className="absolute right-2 top-2 rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white">
+                        <span className="absolute right-2 top-2 rounded-md bg-danger px-2 py-0.5 text-xs font-bold text-white">
                           -{pSale.percent}%
                         </span>
                       )}
@@ -446,11 +420,11 @@ export default async function ProductDetailPage({ params }: Props) {
                         {p.nameAr || p.name}
                       </h3>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-purple-accent">
+                        <span className="text-sm font-bold tabular-nums text-white">
                           {formatPrice(pSale.final)}
                         </span>
                         {pSale.was !== null && (
-                          <span className="text-xs text-gray-text line-through">
+                          <span className="text-xs tabular-nums text-gray-muted line-through">
                             {formatPrice(pSale.was)}
                           </span>
                         )}

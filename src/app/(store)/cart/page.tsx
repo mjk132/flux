@@ -207,7 +207,7 @@ export default function CartPage() {
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value)}
                 placeholder="أدخل الكود"
-                className="h-10 flex-1 rounded-lg border border-border bg-surface px-3 text-sm text-white placeholder:text-gray-text/60 focus:border-purple-accent focus:outline-none"
+                className="h-10 flex-1 rounded-lg border border-border bg-surface px-3 text-sm text-white placeholder:text-gray-muted focus:border-purple-accent focus:outline-none"
               />
               <Button
                 size="sm"

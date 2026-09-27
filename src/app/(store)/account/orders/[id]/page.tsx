@@ -125,7 +125,7 @@ export default function OrderDetailPage() {
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
                     isCurrent
-                      ? "bg-purple-accent text-white"
+                      ? "bg-accent-solid text-white"
                       : isActive
                       ? "bg-success text-white"
                       : "bg-deep-purple text-gray-text"

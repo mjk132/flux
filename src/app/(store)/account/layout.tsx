@@ -70,7 +70,7 @@ export default function AccountLayout({
                   href={link.href}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-purple-accent text-white"
+                      ? "bg-accent-solid text-white"
                       : "text-gray-text hover:bg-surface hover:text-white"
                   }`}
                 >
@@ -97,7 +97,7 @@ export default function AccountLayout({
                   href={link.href}
                   className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
                     isActive
-                      ? "bg-purple-accent text-white"
+                      ? "bg-accent-solid text-white"
                       : "text-gray-text hover:bg-surface hover:text-white"
                   }`}
                 >

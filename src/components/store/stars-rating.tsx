@@ -27,7 +27,7 @@ export function StarsRating({
             sizeMap[size],
             star <= rating
               ? "fill-amber-400 text-amber-400"
-              : "fill-transparent text-gray-text/30",
+              : "fill-transparent text-faint",
             !readonly && "cursor-pointer transition-colors hover:text-amber-400"
           )}
         />

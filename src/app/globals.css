@@ -17,6 +17,12 @@
   --color-gray-muted: #8579ad;
   --color-faint: #665a8c;
   --color-purple-accent: #2f7bff;
+  /* Solid fills carrying white text (buttons, badges, active pills).
+     #2f7bff reaches only 3.9:1 against white — fine as accent TEXT on the
+     dark canvas (5.1:1), an AA fail as a button background. #1a63e6 keeps
+     the hue and clears 5.2:1 with white glyphs. Same value in every theme
+     scope, so no per-scope override is needed. */
+  --color-accent-solid: #1a63e6;
   --color-violet: #5aa2ff;
   --color-amethyst: #9cc2ff;
   --color-danger: #f43f5e;
@@ -103,7 +109,7 @@ body {
   z-index: 200;
   padding: 0.7rem 1.2rem;
   border-radius: 0 0 0.75rem 0.75rem;
-  background: var(--color-purple-accent);
+  background: var(--color-accent-solid);
   color: #ffffff;
   font-size: 13px;
   font-weight: 700;
@@ -111,6 +117,15 @@ body {
 }
 .skip-link:focus {
   transform: translate(-50%, 0);
+}
+
+/* Tap behavior: `manipulation` removes the 300ms double-tap-zoom delay
+   from every link and button (pinch zoom still works), and the highlight
+   is an intentional brand tint instead of Safari's default gray. */
+a,
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(47, 123, 255, 0.18);
 }
 
 /* One consistent visible focus ring across every interactive element.

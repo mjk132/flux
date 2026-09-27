@@ -39,7 +39,7 @@ export function SectionHeading({
           <span className="h-px w-6 bg-purple-accent/60" />
           {eyebrow}
         </p>
-        <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
+        <h2 className="text-2xl font-extrabold text-white sm:text-3xl text-balance">
           {title}
         </h2>
         {description && (
@@ -52,7 +52,7 @@ export function SectionHeading({
       {href && (
         <Link
           href={href}
-          className="inline-flex items-center rounded-full border border-border px-3.5 py-2 text-[13px] font-semibold text-purple-accent transition-all duration-300 hover:border-purple-accent/40 hover:bg-purple-accent/5 hover:text-violet"
+          className="inline-flex items-center rounded-full border border-border px-3.5 py-2 text-[13px] font-semibold text-purple-accent transition-[border-color,background-color,color] duration-300 hover:border-purple-accent/40 hover:bg-purple-accent/5 hover:text-violet"
         >
           {actionLabel}
         </Link>

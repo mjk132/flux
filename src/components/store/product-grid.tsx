@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard, type ProductCardData } from "./product-card";
 import { Reveal } from "./reveal";
+import { cn } from "@/lib/utils";
 
 interface ProductGridProps {
   products: ProductCardData[];
@@ -30,7 +31,7 @@ function ProductSkeleton() {
 export function ProductGrid({ products, loading = false }: ProductGridProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 min-[440px]:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
           <ProductSkeleton key={i} />
         ))}
@@ -43,7 +44,7 @@ export function ProductGrid({ products, loading = false }: ProductGridProps) {
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-surface">
           <span className="text-xl font-extrabold tracking-tight text-purple-accent/25">
-            Flux
+            FLUX
           </span>
         </div>
         <h3 className="text-base font-semibold text-white">
@@ -56,8 +57,19 @@ export function ProductGrid({ products, loading = false }: ProductGridProps) {
     );
   }
 
+  /* Column count follows inventory so a small catalogue never shows a
+     half-empty row (2 items → 2 columns, 3 → 3 at lg, 4+ → full rhythm).
+     Below 440px everything is one column — a ~158px card with two buttons
+     is unusable, and the bigger single-column card reads more premium. */
+  const cols =
+    products.length <= 2
+      ? "grid-cols-1 min-[440px]:grid-cols-2"
+      : products.length === 3
+        ? "grid-cols-1 min-[440px]:grid-cols-2 lg:grid-cols-3"
+        : "grid-cols-1 min-[440px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+    <div className={cn("grid gap-3 sm:gap-4", cols)}>
       {products.map((product, i) => (
         <Reveal
           key={product.id}

@@ -255,7 +255,7 @@ export function ServiceRequestForm() {
       )}
 
       <Button type="submit" loading={status === "submitting"} className="w-full sm:w-auto">
-        {status === "submitting" ? "جارٍ الإرسال..." : "إرسال الطلب"}
+        {status === "submitting" ? "جارٍ الإرسال…" : "إرسال الطلب"}
       </Button>
     </form>
   );

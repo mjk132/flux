@@ -39,19 +39,21 @@ export function DiscordCtaSection({ discordUrl }: DiscordCtaProps) {
 
   return (
     <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
-      <div className="relative overflow-hidden rounded-3xl border border-purple-accent/25 bg-gradient-to-br from-violet/20 via-deep-purple to-surface">
-        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-purple-accent/25 blur-[90px]" />
-        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-violet/20 blur-[90px]" />
+      <div className="relative overflow-hidden rounded-2xl border border-purple-accent/25 bg-gradient-to-br from-violet/20 via-deep-purple to-surface">
+        {/* Toned-down environment light — one panel may carry the page's
+            strongest color, but the glows stay behind the content */}
+        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-purple-accent/15 blur-[90px]" />
+        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-violet/10 blur-[90px]" />
 
         <div className="relative flex flex-col items-center px-6 py-14 text-center sm:py-16">
-          <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#5865F2] shadow-[0_0_35px_rgba(88,101,242,0.5)]">
+          <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#5865F2] shadow-[0_16px_44px_-16px_rgba(88,101,242,0.6)]">
             <DiscordLogo className="h-8 w-8 text-[#ffffff]" />
           </div>
 
-          <h2 className="max-w-xl text-2xl font-extrabold text-white sm:text-3xl">
+          <h2 className="max-w-xl text-2xl font-extrabold text-white sm:text-3xl text-balance">
             جاهز للخطوة التالية؟
           </h2>
-          <p className="mt-3 max-w-md text-[13.5px] leading-relaxed text-gray-text">
+          <p className="mt-3 max-w-md text-[14px] leading-relaxed text-gray-text">
             انضم إلى سيرفر الديسكورد للاستفسار والدعم والاطلاع على جديد FLUX،
             أو اطلب خدمة تطوير مخصصة تناسبك.
           </p>
@@ -62,7 +64,7 @@ export function DiscordCtaSection({ discordUrl }: DiscordCtaProps) {
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-11 items-center gap-2.5 rounded-xl bg-[#5865F2] px-6 text-sm font-bold text-[#ffffff] transition-all hover:bg-[#4752c4]"
+                className="inline-flex h-12 items-center gap-2.5 rounded-lg bg-[#5865F2] px-6 text-sm font-bold text-[#ffffff] transition-colors hover:bg-[#4752c4]"
               >
                 <DiscordLogo className="h-5 w-5" />
                 انضم إلى ديسكورد
@@ -70,7 +72,7 @@ export function DiscordCtaSection({ discordUrl }: DiscordCtaProps) {
             )}
             <Link
               href="/services"
-              className="inline-flex h-11 items-center gap-2 rounded-xl border border-white/15 px-6 text-sm font-semibold text-gray-text transition-all hover:border-white/30 hover:text-white"
+              className="inline-flex h-12 items-center gap-2 rounded-lg border border-white/15 px-6 text-sm font-semibold text-gray-text transition-[border-color,color] hover:border-white/30 hover:text-white"
             >
               <MessagesSquare className="h-4 w-4" />
               اطلب خدمة مخصصة

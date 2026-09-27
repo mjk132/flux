@@ -157,7 +157,7 @@ export default function AdminNotifications() {
                       )}
                     </div>
                     <p className="mt-0.5 text-sm text-gray-text">{notification.message}</p>
-                    <p className="mt-1 text-xs text-gray-text/60">
+                    <p className="mt-1 text-xs text-gray-muted">
                       {formatTime(notification.createdAt)}
                     </p>
                   </div>

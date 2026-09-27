@@ -76,7 +76,7 @@ export async function StoreFooter({ categories = [] }: StoreFooterProps) {
               </div>
               <span className="flex items-baseline gap-1">
                 <span className="text-lg font-extrabold tracking-tight text-white">
-                  Flux
+                  FLUX
                 </span>
                 <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-gray-muted">
                   Store
@@ -121,25 +121,28 @@ export async function StoreFooter({ categories = [] }: StoreFooterProps) {
             </ul>
           </div>
 
-          {/* Categories */}
-          <div>
-            <h3 className="mb-4 text-[12px] font-bold text-purple-accent">
-              الأقسام
-            </h3>
-            <ul className="space-y-2.5">
-              {categories.slice(0, 6).map((cat) => (
-                <li key={cat.slug}>
-                  <Link
-                    href={`/store?category=${cat.slug}`}
-                    className="group inline-flex items-center gap-2 text-[13px] text-gray-text transition-colors hover:text-white"
-                  >
-                    <span className="h-px w-0 bg-purple-accent transition-all duration-300 group-hover:w-3" />
-                    {cat.nameAr || cat.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Categories — hidden entirely when none exist, so the footer
+              never promises navigation it can't provide */}
+          {categories.length > 0 && (
+            <div>
+              <h3 className="mb-4 text-[12px] font-bold text-purple-accent">
+                الأقسام
+              </h3>
+              <ul className="space-y-2.5">
+                {categories.slice(0, 6).map((cat) => (
+                  <li key={cat.slug}>
+                    <Link
+                      href={`/store?category=${cat.slug}`}
+                      className="group inline-flex items-center gap-2 text-[13px] text-gray-text transition-colors hover:text-white"
+                    >
+                      <span className="h-px w-0 bg-purple-accent transition-all duration-300 group-hover:w-3" />
+                      {cat.nameAr || cat.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Support */}
           <div>
@@ -176,20 +179,20 @@ export async function StoreFooter({ categories = [] }: StoreFooterProps) {
 
         {/* Bottom bar */}
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-6 sm:flex-row">
-          <p className="text-[12px] text-gray-muted">
-            &copy; {new Date().getFullYear()} Flux Store. جميع الحقوق محفوظة.
+          <p className="text-[13px] text-gray-muted">
+            &copy; {new Date().getFullYear()} FLUX. جميع الحقوق محفوظة.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <Link
               href="/terms"
-              className="text-[12px] text-gray-muted transition-colors hover:text-white"
+              className="text-[13px] text-gray-muted transition-colors hover:text-white"
             >
               شروط الاستخدام
             </Link>
             <span className="h-3 w-px bg-border" />
             <Link
               href="/privacy"
-              className="text-[12px] text-gray-muted transition-colors hover:text-white"
+              className="text-[13px] text-gray-muted transition-colors hover:text-white"
             >
               سياسة الخصوصية
             </Link>

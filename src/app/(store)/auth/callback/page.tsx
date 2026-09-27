@@ -57,7 +57,7 @@ function CallbackContent() {
           <p className="text-[15px] font-semibold text-danger">{error}</p>
           <button
             onClick={() => router.replace("/auth/login")}
-            className="mt-4 rounded-xl bg-purple-accent px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-violet"
+            className="mt-4 rounded-xl bg-accent-solid px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1554c9]"
           >
             العودة لتسجيل الدخول
           </button>
