@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Store, Heart, ShoppingCart, User } from "lucide-react";
@@ -20,6 +21,15 @@ function isActiveLink(pathname: string, href: string) {
   return pathname === href;
 }
 
+/* Hydration flip: false while the server markup (and the first client
+   render during hydration) is on screen, true the moment React re-checks
+   the snapshot after hydration. No subscription is needed — the value
+   only ever changes once, and React's post-hydration check forces that
+   re-render itself. */
+const subscribeNoop = () => () => {};
+const getMountedClient = () => true;
+const getMountedServer = () => false;
+
 /**
  * Mobile bottom bar. Each item shows its active state from the current
  * route (the old markup highlighted nothing, so you could never tell
@@ -28,6 +38,17 @@ function isActiveLink(pathname: string, href: string) {
  */
 export function BottomNav() {
   const pathname = usePathname();
+  /* Active marking waits for hydration, for the same reason the top
+     navbar gates it on `mounted`: the prerendered `usePathname()` value
+     can disagree with the browser URL (a documented Next hazard), and
+     server HTML that disagrees with the first client render trips React
+     error #418. The server always draws every item neutral; the current
+     page marking lands one frame later with the real pathname. */
+  const mounted = useSyncExternalStore(
+    subscribeNoop,
+    getMountedClient,
+    getMountedServer
+  );
 
   return (
     <nav
@@ -37,7 +58,7 @@ export function BottomNav() {
     >
       <div className="grid grid-cols-5">
         {bottomLinks.map((link) => {
-          const active = isActiveLink(pathname, link.href);
+          const active = mounted && isActiveLink(pathname, link.href);
           return (
             <Link
               key={link.href}

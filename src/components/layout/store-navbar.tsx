@@ -137,9 +137,19 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
     router.push("/");
   }
 
+  /* Active-link marking is gated on `mounted`, exactly like the cart
+     badge above: during the static prerender Next can resolve
+     `usePathname()` to a value that doesn't match the browser URL (a
+     documented hydration-mismatch hazard), and hydrated the server's
+     "nothing active" against the client's "home active" — React error
+     #418 on the homepage. The server HTML and the first client render
+     therefore always draw every link neutral, and the pill/dot land one
+     frame after hydration with the real pathname. */
   function isActive(href: string) {
+    if (!mounted) return false;
     if (href === "/") return pathname === "/";
-    if (href === "/store") return pathname.startsWith("/store") && pathname !== "/";
+    if (href === "/store")
+      return pathname.startsWith("/store") && pathname !== "/";
     if (href === "/services") return pathname.startsWith("/services");
     return pathname === href;
   }
