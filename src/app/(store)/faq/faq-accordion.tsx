@@ -23,10 +23,13 @@ export default function FAQAccordion({ faqs }: { faqs: FAQ[] }) {
             className="rounded-2xl border border-border bg-surface overflow-hidden"
           >
             <button
+              type="button"
               onClick={() => setOpenId(isOpen ? null : faq.id)}
+              aria-expanded={isOpen}
+              aria-controls={`faq-panel-${faq.id}`}
               className="flex w-full items-center justify-between px-5 py-4 text-right"
             >
-              <span className="text-sm font-medium text-white">
+              <span className="text-sm font-semibold text-white">
                 {faq.question}
               </span>
               <ChevronDown
@@ -36,13 +39,16 @@ export default function FAQAccordion({ faqs }: { faqs: FAQ[] }) {
                 )}
               />
             </button>
+            {/* grid-rows animation instead of max-h: a tall answer used to
+                be clipped at 384px with no way to read the rest */}
             <div
+              id={`faq-panel-${faq.id}`}
               className={cn(
-                "overflow-hidden transition-all duration-200",
-                isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                "grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-in-out",
+                isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
               )}
             >
-              <div className="border-t border-border px-5 py-4">
+              <div className="min-h-0 overflow-hidden border-t border-border px-5 py-4">
                 <p className="text-sm leading-relaxed text-gray-text">
                   {faq.answer}
                 </p>
