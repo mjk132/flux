@@ -8,12 +8,39 @@ function json(data: Record<string, unknown>, status = 200) {
   return NextResponse.json(data, { status });
 }
 
+/* Lazy migration: in serverless environments the database may not have the
+   ServiceRequest table yet (no build-time migration step). This runs once on
+   first API call and is a no-op if the table already exists. */
+let serviceRequestTableEnsured = false;
+async function ensureServiceRequestTable() {
+  if (serviceRequestTableEnsured) return;
+  try {
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "ServiceRequest" (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        contact TEXT NOT NULL,
+        "serviceType" TEXT NOT NULL,
+        description TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'NEW',
+        "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+    await prisma.$executeRaw`CREATE INDEX IF NOT EXISTS "ServiceRequest_status_createdAt_idx" ON "ServiceRequest" (status, "createdAt");`;
+  } catch {
+    // Ignore: table might already exist, or another instance created it.
+  }
+  serviceRequestTableEnsured = true;
+}
+
 /**
  * POST /api/services — public. Creates a service request from the storefront
  * form and raises a notification for every OWNER so the request is visible in
  * the admin notifications page.
  */
 export async function POST(request: NextRequest) {
+  await ensureServiceRequestTable();
   try {
     const body = await request.json().catch(() => null);
     const parsed = serviceRequestCreateSchema.safeParse(body);
