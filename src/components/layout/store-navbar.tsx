@@ -203,7 +203,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
               >
                 {link.label}
                 {isActive(link.href) && (
-                  <span className="absolute inset-x-1/2 -bottom-[3px] h-1 w-1 -translate-x-1/2 rounded-full bg-purple-accent shadow-[0_0_6px_rgba(47,123,255,0.9)]" />
+                  <span className="absolute inset-x-1/2 -bottom-[3px] h-1 w-1 -translate-x-1/2 flux-indicator-pop rounded-full bg-purple-accent shadow-[0_0_6px_rgba(47,123,255,0.9)]" />
                 )}
               </Link>
             ))}
@@ -386,7 +386,7 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
           )}
         >
           <div className="space-y-0.5 px-4 py-4">
-            {navLinks.map((link) => (
+            {navLinks.map((link, i) => (
               <Link
                 key={link.label}
                 href={link.href}
@@ -395,8 +395,11 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
                   "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors",
                   isActive(link.href)
                     ? "bg-surface-raised text-white"
-                    : "text-gray-text hover:text-white"
+                    : "text-gray-text hover:text-white",
+                  /* Staggered entrance while the panel slides open */
+                  mobileOpen && "animate-flux-up"
                 )}
+                style={mobileOpen ? { animationDelay: `${i * 45}ms` } : undefined}
               >
                 <link.icon className="h-4 w-4" />
                 {link.label}
@@ -411,12 +414,20 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
                 <p className="px-3 pb-1 text-[11px] font-semibold text-gray-muted">
                   الأقسام
                 </p>
-                {categories.slice(0, 8).map((cat) => (
+                {categories.slice(0, 8).map((cat, ci) => (
                   <Link
                     key={cat.slug}
                     href={`/store?category=${cat.slug}`}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] text-gray-text transition-colors hover:text-white"
+                    className={cn(
+                      "flex items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] text-gray-text transition-colors hover:text-white",
+                      mobileOpen && "animate-flux-up"
+                    )}
+                    style={
+                      mobileOpen
+                        ? { animationDelay: `${(navLinks.length + ci) * 45}ms` }
+                        : undefined
+                    }
                   >
                     <span className="h-1 w-1 rounded-full bg-purple-accent/60" />
                     {cat.nameAr || cat.name}
@@ -425,7 +436,19 @@ export function StoreNavbar({ categories = [] }: { categories?: NavCategory[] })
               </>
             )}
             {!isAuthenticated && (
-              <div className="flex gap-2 pt-3">
+              <div
+                className={cn(
+                  "flex gap-2 pt-3",
+                  mobileOpen && "animate-flux-up"
+                )}
+                style={
+                  mobileOpen
+                    ? {
+                        animationDelay: `${(navLinks.length + Math.min(categories.length, 8) + 1) * 45}ms`,
+                      }
+                    : undefined
+                }
+              >
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileOpen(false)}

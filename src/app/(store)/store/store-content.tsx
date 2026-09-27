@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { ProductGrid } from "@/components/store/product-grid";
 import { FeaturedProduct } from "@/components/store/featured-product";
+import { Reveal } from "@/components/store/reveal";
 import { cn } from "@/lib/utils";
 import type { ProductCardData } from "@/components/store/product-card";
 
@@ -677,9 +678,11 @@ function StoreContent({ initial }: { initial?: StoreInitial }) {
               {/* One result earns the featured band, not a lone card in a
                   four-column grid */}
               {products.length === 1 ? (
-                <FeaturedProduct
-                  product={products[0] as unknown as ProductCardData}
-                />
+                <Reveal duration={650}>
+                  <FeaturedProduct
+                    product={products[0] as unknown as ProductCardData}
+                  />
+                </Reveal>
               ) : (
                 <ProductGrid
                   products={products as unknown as ProductCardData[]}

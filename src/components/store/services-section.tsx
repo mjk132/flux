@@ -12,6 +12,10 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SectionHeading } from "./section-heading";
+import { Reveal } from "./reveal";
+import { DiscordChat } from "@/components/showcase/discord-chat";
+import { BrowserSite } from "@/components/showcase/browser-site";
+import { InView } from "@/components/showcase/in-view";
 import { SERVICES } from "@/config/services";
 
 /** Icon names come from the shared SERVICES config; unknown names fall
@@ -28,9 +32,15 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 /** Two services lead (they cover most requests); the rest stay compact.
-    The flagships span two columns at lg, which gives the grid a rhythm
-    instead of six identical icon-plus-paragraph tiles. */
+    The flagships span two columns at lg and pair their copy with a live
+    interface preview — the grid gets a rhythm instead of six identical
+    icon-plus-paragraph tiles. */
 const FLAGSHIP = new Set(["discord", "websites"]);
+
+const SHOWCASES: Record<string, React.ComponentType<{ className?: string }>> = {
+  discord: DiscordChat,
+  websites: BrowserSite,
+};
 
 /**
  * Homepage services block — the second half of FLUX's offer (custom
@@ -43,29 +53,24 @@ export function ServicesSection() {
   return (
     <section className="border-t border-border/40 bg-dark-purple/50">
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
-        <SectionHeading
-          eyebrow="خدمات التطوير"
-          title="ما يُبنى لطلبك"
-          description="ست خدمات يُنفذها فريق FLUX حسب احتياجك — اختر الخدمة، أرسل التفاصيل، ونتفق قبل البدء."
-          href="/services"
-          actionLabel="كل الخدمات"
-        />
+        <Reveal>
+          <SectionHeading
+            eyebrow="خدمات التطوير"
+            title="ما يُبنى لطلبك"
+            description="ست خدمات يُنفذها فريق FLUX حسب احتياجك — اختر الخدمة، أرسل التفاصيل، ونتفق قبل البدء."
+            href="/services"
+            actionLabel="كل الخدمات"
+          />
+        </Reveal>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((service) => {
+          {SERVICES.map((service, i) => {
             const Icon = ICONS[service.icon] ?? Wrench;
             const flagship = FLAGSHIP.has(service.slug);
-            return (
-              <article
-                key={service.slug}
-                className={[
-                  "group relative flex flex-col rounded-2xl border border-border/60 bg-surface p-6 transition-[border-color,background-color,box-shadow] duration-300",
-                  "hover:border-purple-accent/40 hover:bg-surface-raised focus-within:border-purple-accent/60",
-                  flagship
-                    ? "lg:col-span-2 lg:p-7"
-                    : "",
-                ].join(" ")}
-              >
+            const Showcase = SHOWCASES[service.slug];
+
+            const body = (
+              <>
                 <div
                   className={
                     flagship
@@ -123,37 +128,78 @@ export function ServicesSection() {
                   </ul>
                 )}
 
-                <div
-                  className={flagship ? "mt-auto pt-6" : "mt-auto pt-4"}
-                >
+                <div className={flagship ? "mt-auto pt-6" : "mt-auto pt-4"}>
                   <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-purple-accent">
                     اطلب هذه الخدمة
                     <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
                   </span>
                 </div>
-              </article>
+              </>
+            );
+
+            return (
+              <Reveal
+                key={service.slug}
+                delay={i * 60}
+                duration={600}
+                className={flagship ? "lg:col-span-2" : ""}
+              >
+                <article
+                  className={[
+                    "group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-surface p-6 transition-[border-color,background-color,box-shadow] duration-300",
+                    "hover:border-purple-accent/40 hover:bg-surface-raised focus-within:border-purple-accent/60",
+                    flagship ? "lg:p-7" : "",
+                  ].join(" ")}
+                >
+                  {flagship && Showcase ? (
+                    /* Copy leads (right, RTL), the interface preview sits
+                       beside it at lg and stacks underneath on small
+                       screens — the card shows the deliverable instead of
+                       only describing it. Rows stay stretched (no
+                       items-center) so the copy column's mt-auto still pins
+                       the CTA to the card floor; the mock stretches with the
+                       row. InView starts its sequence only when seen. */
+                    <div className="grid flex-1 gap-6 lg:grid-cols-[1.05fr_1fr]">
+                      <div className="flex flex-col">{body}</div>
+                      <div className="min-w-0">
+                        <InView className="h-full">
+                          <Showcase />
+                        </InView>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-1 flex-col">{body}</div>
+                  )}
+                </article>
+              </Reveal>
             );
           })}
 
           {/* Closing tile — one clear path to the request form */}
-          <Link
-            href="/services#request"
-            className="group flex flex-col justify-between rounded-2xl border border-purple-accent/30 bg-purple-accent/[0.06] p-6 transition-[border-color,background-color] duration-300 hover:border-purple-accent/60 hover:bg-purple-accent/10 sm:col-span-2 lg:col-span-1"
+          <Reveal
+            delay={SERVICES.length * 60}
+            duration={600}
+            className="sm:col-span-2 lg:col-span-1"
           >
-            <div>
-              <h3 className="text-[15px] font-bold text-white">
-                لا تجد ما تبحث عنه؟
-              </h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-gray-text">
-                صف فكرتك في طلب واحد — نراجعها ونتواصل معك لمناقشة التفاصيل
-                قبل أي التزام.
-              </p>
-            </div>
-            <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-purple-accent">
-              ابدأ طلب الخدمة
-              <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
-            </span>
-          </Link>
+            <Link
+              href="/services#request"
+              className="group flex h-full flex-col justify-between rounded-2xl border border-purple-accent/30 bg-purple-accent/[0.06] p-6 transition-[border-color,background-color] duration-300 hover:border-purple-accent/60 hover:bg-purple-accent/10"
+            >
+              <div>
+                <h3 className="text-[15px] font-bold text-white">
+                  لا تجد ما تبحث عنه؟
+                </h3>
+                <p className="mt-2 text-[13px] leading-relaxed text-gray-text">
+                  صف فكرتك في طلب واحد — نراجعها ونتواصل معك لمناقشة التفاصيل
+                  قبل أي التزام.
+                </p>
+              </div>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-purple-accent">
+                ابدأ طلب الخدمة
+                <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
+              </span>
+            </Link>
+          </Reveal>
         </div>
       </div>
     </section>

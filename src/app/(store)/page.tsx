@@ -16,6 +16,7 @@ import { FaqSection } from "@/components/store/faq-section";
 import { DiscordCtaSection } from "@/components/store/discord-cta";
 import { ServicesSection } from "@/components/store/services-section";
 import { SectionHeading } from "@/components/store/section-heading";
+import { Reveal } from "@/components/store/reveal";
 import type { ProductCardData } from "@/components/store/product-card";
 
 /* Prerendered at build + ISR instead of `force-dynamic`.
@@ -176,21 +177,25 @@ export default async function HomePage() {
       {/* ═══════════ CAPABILITIES (always true) ═══════════ */}
       <section className="border-b border-border/40 bg-surface/40">
         <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-px px-4 sm:grid-cols-3 sm:px-6 lg:px-8">
-          {capabilities.map((s) => (
-            <div
+          {capabilities.map((s, i) => (
+            <Reveal
               key={s.title}
-              className="flex items-start gap-3 border-b border-border/40 px-2 py-6 last:border-b-0 sm:border-b-0 sm:px-6 sm:[&:not(:last-child)]:border-l"
+              delay={i * 70}
+              duration={600}
+              className="border-b border-border/40 last:border-b-0 sm:border-b-0 sm:[&:not(:last-child)]:border-l"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-accent/10 ring-1 ring-purple-accent/20">
-                <s.icon className="h-5 w-5 text-purple-accent" />
+              <div className="flex items-start gap-3 px-2 py-6 sm:px-6">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-accent/10 ring-1 ring-purple-accent/20">
+                  <s.icon className="h-5 w-5 text-purple-accent" />
+                </div>
+                <div>
+                  <p className="text-[14px] font-bold text-white">{s.title}</p>
+                  <p className="mt-0.5 text-[13px] leading-relaxed text-gray-muted">
+                    {s.desc}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-[14px] font-bold text-white">{s.title}</p>
-                <p className="mt-0.5 text-[13px] leading-relaxed text-gray-muted">
-                  {s.desc}
-                </p>
-              </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -198,20 +203,20 @@ export default async function HomePage() {
       {/* ═══════════ CATEGORIES (only non-empty ones) ═══════════ */}
       {showCategories && (
         <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
-          <SectionHeading
-            eyebrow="تصفح حسب القسم"
-            title="الأقسام"
-            description="اختر القسم الذي يناسب احتياجك — كل المنتجات منظّمة بداخله."
-            href="/store"
-            actionLabel="كل الأقسام"
-          />
+          <Reveal>
+            <SectionHeading
+              eyebrow="تصفح حسب القسم"
+              title="الأقسام"
+              description="اختر القسم الذي يناسب احتياجك — كل المنتجات منظّمة بداخله."
+              href="/store"
+              actionLabel="كل الأقسام"
+            />
+          </Reveal>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-            {categoriesWithProducts.map((cat) => (
-              <CategoryCard
-                key={cat.id}
-                category={cat}
-                className="h-full"
-              />
+            {categoriesWithProducts.map((cat, i) => (
+              <Reveal key={cat.id} delay={i * 70} duration={600} className="h-full">
+                <CategoryCard category={cat} className="h-full" />
+              </Reveal>
             ))}
           </div>
         </section>
@@ -221,18 +226,22 @@ export default async function HomePage() {
       {products.length > 0 && (
         <section className="border-y border-border/40 bg-surface/30">
           <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
-            <SectionHeading
-              eyebrow="المتجر"
-              title="منتجات متاحة الآن"
-              description="منتجات رقمية جاهزة للشراء — السعر والخصم معلنان قبل الطلب."
-              href="/store"
-              actionLabel="كل المنتجات"
-            />
+            <Reveal>
+              <SectionHeading
+                eyebrow="المتجر"
+                title="منتجات متاحة الآن"
+                description="منتجات رقمية جاهزة للشراء — السعر والخصم معلنان قبل الطلب."
+                href="/store"
+                actionLabel="كل المنتجات"
+              />
+            </Reveal>
             {/* One product earns a full-width featured band instead of a
                 single card lost in a four-column grid — the layout never
                 promises inventory the store doesn't have. */}
             {products.length === 1 ? (
-              <FeaturedProduct product={toCard(products[0])} />
+              <Reveal duration={650}>
+                <FeaturedProduct product={toCard(products[0])} />
+              </Reveal>
             ) : (
               <ProductGrid products={products.map(toCard)} />
             )}

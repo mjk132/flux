@@ -35,14 +35,15 @@ export function ProductGallery({
 
   return (
     <div>
-      <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-deep-purple">
+      <div className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-deep-purple">
         {current ? (
           <Image
+            key={current.url}
             src={current.url}
             alt={current.alt || name}
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
+            className="animate-flux-in object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
             priority
           />
         ) : (

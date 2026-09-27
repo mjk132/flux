@@ -3,6 +3,12 @@ import { Bot, Gamepad2, Globe, LayoutDashboard, Code, Palette, Check } from "luc
 import type { LucideIcon } from "lucide-react";
 import { SERVICES } from "@/config/services";
 import { ServiceRequestForm } from "@/components/store/service-request-form";
+import { Reveal } from "@/components/store/reveal";
+import { DiscordChat } from "@/components/showcase/discord-chat";
+import { BrowserSite } from "@/components/showcase/browser-site";
+import { DashboardPanel } from "@/components/showcase/dashboard-panel";
+import { TerminalScript } from "@/components/showcase/terminal-script";
+import { InView } from "@/components/showcase/in-view";
 
 export const metadata: Metadata = {
   title: "الخدمات — تطوير مخصص | FLUX",
@@ -17,6 +23,18 @@ const serviceIcons: Record<string, LucideIcon> = {
   LayoutDashboard,
   Code,
   Palette,
+};
+
+/* The four services whose deliverable is an interface get a purpose-built
+   preview at the top of the card (bleeding to the card's top edge). The
+   two advisory services — custom programming and UI design — stay text:
+   a mockup there would be decoration, not evidence. All four previews are
+   tagged as illustrative inside the artwork. */
+const SHOWCASES: Record<string, React.ComponentType<{ className?: string }>> = {
+  discord: DiscordChat,
+  fivem: TerminalScript,
+  websites: BrowserSite,
+  dashboards: DashboardPanel,
 };
 
 export default function ServicesPage() {
@@ -38,35 +56,51 @@ export default function ServicesPage() {
       </header>
 
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {SERVICES.map((service) => {
+        {SERVICES.map((service, i) => {
           const Icon = serviceIcons[service.icon] ?? Bot;
+          const Showcase = SHOWCASES[service.slug];
           return (
             <li
               key={service.slug}
               id={service.slug}
-              className="flex scroll-mt-28 flex-col rounded-2xl border border-border bg-surface p-5"
+              className="scroll-mt-28 rounded-2xl border border-border bg-surface"
             >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-purple-accent/10">
-                <Icon className="h-5 w-5 text-purple-accent" aria-hidden="true" />
-              </div>
-              <h2 className="text-lg font-bold text-white">{service.title}</h2>
-              <p className="mt-1.5 text-sm leading-relaxed text-gray-text">
-                {service.summary}
-              </p>
-              <ul className="mt-4 space-y-2 border-t border-border/60 pt-4">
-                {service.deliverables.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-[13px] leading-relaxed text-gray-muted"
-                  >
-                    <Check
-                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-purple-accent"
-                      aria-hidden="true"
-                    />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              <Reveal delay={(i % 3) * 70} duration={600} className="flex h-full flex-col">
+                {Showcase ? (
+                  <div className="h-[216px] overflow-hidden rounded-t-2xl border-b border-border/60 bg-void sm:h-[228px]">
+                    {/* Flush mount: the preview becomes the card's media
+                        header, so its own frame/radius/shadow are dropped.
+                        InView starts its sequence only when seen. */}
+                    <InView className="h-full">
+                      <Showcase className="h-full rounded-none border-0 shadow-none" />
+                    </InView>
+                  </div>
+                ) : null}
+
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-purple-accent/10">
+                    <Icon className="h-5 w-5 text-purple-accent" aria-hidden="true" />
+                  </div>
+                  <h2 className="text-lg font-bold text-white">{service.title}</h2>
+                  <p className="mt-1.5 text-sm leading-relaxed text-gray-text">
+                    {service.summary}
+                  </p>
+                  <ul className="mt-4 space-y-2 border-t border-border/60 pt-4">
+                    {service.deliverables.map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-2 text-[13px] leading-relaxed text-gray-muted"
+                      >
+                        <Check
+                          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-purple-accent"
+                          aria-hidden="true"
+                        />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
             </li>
           );
         })}
@@ -77,18 +111,20 @@ export default function ServicesPage() {
         aria-labelledby="service-request-heading"
         className="mt-12 scroll-mt-28 rounded-2xl border border-border bg-surface p-5 sm:p-8"
       >
-        <div className="max-w-2xl">
-          <h2 id="service-request-heading" className="text-2xl font-extrabold text-white">
-            اطلب خدمة
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-gray-text">
-            املأ النموذج التالي وصف احتياجك، وسنراجع طلبك ونتواصل معك عبر وسيلة
-            التواصل التي تُدخلها.
-          </p>
-        </div>
-        <div className="mt-6 max-w-2xl">
-          <ServiceRequestForm />
-        </div>
+        <Reveal>
+          <div className="max-w-2xl">
+            <h2 id="service-request-heading" className="text-2xl font-extrabold text-white">
+              اطلب خدمة
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-gray-text">
+              املأ النموذج التالي وصف احتياجك، وسنراجع طلبك ونتواصل معك عبر وسيلة
+              التواصل التي تُدخلها.
+            </p>
+          </div>
+          <div className="mt-6 max-w-2xl">
+            <ServiceRequestForm />
+          </div>
+        </Reveal>
       </section>
     </div>
   );

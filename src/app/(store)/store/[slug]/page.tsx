@@ -7,6 +7,7 @@ import { getSalePrice } from "@/lib/pricing";
 import type { Metadata } from "next";
 import { Star, ChevronLeft, Package } from "lucide-react";
 import { ProductGallery } from "@/components/store/product-gallery";
+import { Reveal } from "@/components/store/reveal";
 import ProductDetailClient from "./product-detail-client";
 
 // Static + ISR. Product pages are prerendered for every published slug at
@@ -248,7 +249,8 @@ export default async function ProductDetailPage({ params }: Props) {
 
             return (
               <div className="mt-8 border-t border-border pt-6">
-                <div className="space-y-4">
+                <Reveal duration={650}>
+                  <div className="space-y-4">
                   {description && (
                     <div className="rounded-lg border border-border bg-surface p-4">
                       <h3 className="mb-2 text-sm font-semibold text-white">
@@ -318,6 +320,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     </div>
                   )}
                 </div>
+                </Reveal>
               </div>
             );
           })()}
@@ -331,37 +334,36 @@ export default async function ProductDetailPage({ params }: Props) {
             التقييمات ({product.reviews.length})
           </h2>
           <div className="space-y-4">
-            {product.reviews.map((review) => (
-              <div
-                key={review.id}
-                className="rounded-2xl border border-border bg-surface p-4"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-solid text-xs font-bold text-white">
-                    {review.user.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">
-                      {review.user.name}
-                    </p>
-                    <div className="flex items-center gap-0.5">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <Star
-                          key={i}
-                          className={`h-3 w-3 ${
-                            i <= review.rating
-                              ? "fill-amber-400 text-amber-400"
-                              : "text-faint"
-                          }`}
-                        />
-                      ))}
+            {product.reviews.map((review, i) => (
+              <Reveal key={review.id} delay={i * 60} duration={600}>
+                <div className="rounded-2xl border border-border bg-surface p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-solid text-xs font-bold text-white">
+                      {review.user.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {review.user.name}
+                      </p>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-3 w-3 ${
+                              star <= review.rating
+                                ? "fill-amber-400 text-amber-400"
+                                : "text-faint"
+                            }`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
+                  {review.comment && (
+                    <p className="text-sm text-gray-text">{review.comment}</p>
+                  )}
                 </div>
-                {review.comment && (
-                  <p className="text-sm text-gray-text">{review.comment}</p>
-                )}
-              </div>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -380,19 +382,14 @@ export default async function ProductDetailPage({ params }: Props) {
                   : "grid grid-cols-2 gap-4 sm:grid-cols-4"
             }
           >
-            {relatedProducts.map((p) => {
-              const pAvg =
-                p.reviews.length > 0
-                  ? p.reviews.reduce((s, r) => s + r.rating, 0) /
-                    p.reviews.length
-                  : 0;
+            {relatedProducts.map((p, i) => {
               const pSale = getSalePrice(p);
 
               return (
+                <Reveal key={p.id} delay={i * 60} duration={600}>
                 <Link
-                  key={p.id}
                   href={`/store/${p.slug}`}
-                  className="group block"
+                  className="group block h-full"
                 >
                   <div className="overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:border-purple-accent/30">
                     <div className="relative aspect-square bg-deep-purple overflow-hidden">
@@ -432,6 +429,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     </div>
                   </div>
                 </Link>
+                </Reveal>
               );
             })}
           </div>

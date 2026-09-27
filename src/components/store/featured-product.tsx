@@ -56,7 +56,7 @@ export function FeaturedProduct({ product }: { product: ProductCardData }) {
   };
 
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-border/60 bg-surface transition-[border-color,box-shadow] duration-300 hover:border-purple-accent/35 hover:shadow-[0_16px_44px_-22px_rgba(47,123,255,0.45)] focus-within:border-purple-accent/60">
+    <article className="group relative overflow-hidden rounded-2xl border border-border/60 bg-surface transition-[border-color,box-shadow,translate] duration-300 hover:-translate-y-0.5 hover:border-purple-accent/35 hover:shadow-[0_16px_44px_-22px_rgba(47,123,255,0.45)] focus-within:border-purple-accent/60">
       <div className="grid sm:grid-cols-[1.1fr_1fr]">
         {/* Media — real render (or generated category art when there is none) */}
         <div className="relative aspect-[4/3] overflow-hidden border-b border-border/40 sm:aspect-auto sm:min-h-[380px] sm:border-b-0 sm:border-l">
@@ -142,7 +142,7 @@ export function FeaturedProduct({ product }: { product: ProductCardData }) {
               onClick={handleAddToCart}
               disabled={outOfStock}
               className={cn(
-                "relative z-20 mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-lg px-7 text-[14px] font-bold transition-[background-color,box-shadow,transform] duration-200 active:scale-[0.98]",
+                "relative z-20 mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-lg px-7 text-[14px] font-bold transition-[background-color,box-shadow,scale] duration-200 active:scale-[0.98]",
                 outOfStock
                   ? "cursor-not-allowed border border-border text-gray-muted"
                   : added

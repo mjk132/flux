@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Reveal } from "./reveal";
 
 /**
  * "Why FLUX" — the brand statement, deliberately in a different voice
@@ -37,36 +38,40 @@ export function WhyFluxSection() {
         {/* Statement */}
         <div className="relative">
           <div className="sticky top-28">
-            <p className="mb-2 text-[12px] font-bold text-purple-accent">
-              لماذا FLUX؟
-            </p>
-            <h2 className="text-2xl font-extrabold leading-snug text-white sm:text-3xl lg:text-4xl text-balance">
-              متجر منتجات، وورشة تطوير — في مكان واحد
-            </h2>
-            <p className="mt-4 max-w-md text-[14px] leading-relaxed text-gray-text">
-              تختار منتجاً جاهزاً وتشتريه في دقائق، أو تطلب تنفيذاً مخصصاً
-              يبدأ من فكرتك. نفس الفريق، نفس القناة، ونفس الشفافية في السعر.
-            </p>
-            <Link
-              href="/services"
-              className="mt-6 inline-flex items-center rounded-lg border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-[border-color,color] duration-300 hover:border-purple-accent/50 hover:text-white"
-            >
-              تعرّف على الخدمات
-            </Link>
+            <Reveal duration={650}>
+              <p className="mb-2 text-[12px] font-bold text-purple-accent">
+                لماذا FLUX؟
+              </p>
+              <h2 className="text-2xl font-extrabold leading-snug text-white sm:text-3xl lg:text-4xl text-balance">
+                متجر منتجات، وورشة تطوير — في مكان واحد
+              </h2>
+              <p className="mt-4 max-w-md text-[14px] leading-relaxed text-gray-text">
+                تختار منتجاً جاهزاً وتشتريه في دقائق، أو تطلب تنفيذاً مخصصاً
+                يبدأ من فكرتك. نفس الفريق، نفس القناة، ونفس الشفافية في السعر.
+              </p>
+              <Link
+                href="/services"
+                className="mt-6 inline-flex items-center rounded-lg border border-border px-5 py-2.5 text-[13px] font-semibold text-gray-text transition-[border-color,color] duration-300 hover:border-purple-accent/50 hover:text-white"
+              >
+                تعرّف على الخدمات
+              </Link>
+            </Reveal>
           </div>
         </div>
 
         {/* Positioning — divided typographic rows, no icon boxes */}
         <div className="divide-y divide-border/60 border-y border-border/60">
-          {positions.map((f) => (
-            <div key={f.title} className="py-7 sm:py-8">
-              <h3 className="text-[17px] font-bold text-white sm:text-lg">
-                {f.title}
-              </h3>
-              <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-gray-text">
-                {f.desc}
-              </p>
-            </div>
+          {positions.map((f, i) => (
+            <Reveal key={f.title} delay={i * 80} duration={650}>
+              <div className="py-7 sm:py-8">
+                <h3 className="text-[17px] font-bold text-white sm:text-lg">
+                  {f.title}
+                </h3>
+                <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-gray-text">
+                  {f.desc}
+                </p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>

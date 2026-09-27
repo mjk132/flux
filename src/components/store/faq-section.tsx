@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ChevronDown, MessageCircleQuestion } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Reveal } from "./reveal";
 import type { FAQ } from "@/types";
 
 interface FaqSectionProps {
@@ -84,7 +85,9 @@ export function FaqSection({ faqs }: FaqSectionProps) {
         {/* Accordion */}
         <div className="space-y-3">
           {faqs.map((faq, i) => (
-            <FaqItem key={faq.id} faq={faq} index={i} />
+            <Reveal key={faq.id} delay={i * 60} duration={600}>
+              <FaqItem faq={faq} index={i} />
+            </Reveal>
           ))}
         </div>
       </div>

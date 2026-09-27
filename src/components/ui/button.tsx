@@ -50,7 +50,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          "inline-flex items-center justify-center font-medium transition-all duration-200",
+          "inline-flex items-center justify-center font-medium transition-[background-color,border-color,color,box-shadow,translate,scale,opacity] duration-200",
           "hover:-translate-y-[1px] active:translate-y-0 active:scale-[0.97]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-accent/50",
           "disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:scale-100",
